@@ -34,12 +34,12 @@ public class VehicleStation : UdonSharpBehaviour
     {
         if (player.isLocal)
         {
-            linkedVehicle.active = true;
+            linkedVehicle.Active = true;
             seated = true;
         }
         else
         {
-            linkedVehicle.active = false;
+            linkedVehicle.Active = false;
         }
     }
 
@@ -47,7 +47,7 @@ public class VehicleStation : UdonSharpBehaviour
     {
         if (player.isLocal)
         {
-            linkedVehicle.active = false;
+            linkedVehicle.Active = false;
             seated = false;
         }
     }

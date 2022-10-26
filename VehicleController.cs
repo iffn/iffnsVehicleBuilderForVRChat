@@ -18,9 +18,27 @@ public class VehicleController : UdonSharpBehaviour
 
     float driveInput = 0;
     float steeringInput = 0;
-    float breakingInput = 0;
+    float breakingInput = 1;
 
-    public bool active = false;
+    bool active = false;
+
+    public bool Active
+    {
+        get
+        {
+            return active;
+        }
+        set
+        {
+            active = value;
+
+            if (!value)
+            {
+                ResetInputs();
+            }
+        }
+    }
+
     Transform[] wheelMeshes;
 
     public VehicleStates CurrentVehicleState { get; private set; } = VehicleStates.inactive;
@@ -80,6 +98,13 @@ public class VehicleController : UdonSharpBehaviour
 
             wheelColliders[i].brakeTorque = breakTorquePerWheel * breakingInput;
         }
+    }
+
+    void ResetInputs()
+    {
+        driveInput = 0;
+        steeringInput = 0;
+        breakingInput = 1;
     }
 
     void Control()
@@ -149,7 +174,7 @@ public class VehicleController : UdonSharpBehaviour
 
     private void Update()
     {
-        if (active)
+        if (Active)
         {
             Control();
         }
