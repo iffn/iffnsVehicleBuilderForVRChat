@@ -54,7 +54,7 @@ public class WheeledVehicleBuilder : UdonSharpBehaviour
     {
         mass = 1000;
         widthWithWheels = 2;
-        length = 2;
+        length = 3;
         centerOfMassPositionRelativeToCenterBottom = 0.5f * Vector3.up;
         driverStationPositionRelativeToCenterBottom = 0.5f * Vector3.up;
 
@@ -157,8 +157,6 @@ public class WheeledVehicleBuilder : UdonSharpBehaviour
             wheelColliders = newWheelColliderArray;
         }
 
-        float firstWheelPosition = (numberOfWheels / 2 - 1) * (wheelRadius * 2 + 0.2f) * 0.5f;
-
         wheelMeshes = new Transform[numberOfWheels];
 
         for (int i = 0; i < numberOfWheels; i++)
@@ -167,6 +165,9 @@ public class WheeledVehicleBuilder : UdonSharpBehaviour
         }
 
         //Set wheel parameters
+        float firstWheelPosition = length * 0.5f;
+        float distanceBetweenWheels = length / (numberOfWheels / 2 - 1);
+
         for (int i = 0; i < numberOfWheels; i++)
         {
             wheelColliders[i].radius = wheelRadius;
@@ -175,7 +176,7 @@ public class WheeledVehicleBuilder : UdonSharpBehaviour
 
             float sideMultiplicator = 1 - 2 * (i % 2); //1 if even, -1 if uneven
 
-            float forwardPosition = symetricArrayIndex * (wheelRadius * 2 + 0.2f) - firstWheelPosition;
+            float forwardPosition = symetricArrayIndex * distanceBetweenWheels - firstWheelPosition;
 
             wheelMeshes[i].localScale = new Vector3(wheelRadius * 2, wheelMeshes[i].localScale.y, wheelRadius * 2);
 
