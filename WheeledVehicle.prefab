@@ -57,6 +57,17 @@ MonoBehaviour:
   DriverStaion: {fileID: 1480375597850299799}
   WheelPrefab: {fileID: 324374023685153349, guid: 86e4b812dd180ed4f9a4cb491a6735c9,
     type: 3}
+  mass: 0
+  widthWithWheels: 0
+  length: 0
+  centerOfMassPositionRelativeToCenterBottom: {x: 0, y: 0, z: 0}
+  driverStationPositionRelativeToCenterBottom: {x: 0, y: 0, z: 0}
+  numberOfWheels: 0
+  wheelRadius: 0
+  motorTorquePerDrivenWheel: 0
+  breakTorquePerWheel: 0
+  drivenWheelPairs: 
+  steeringAngleDeg: []
 --- !u!114 &1480375597205017747
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -275,15 +286,15 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1480375598502729160}
-  m_LocalRotation: {x: -0, y: 0.79985344, z: -0, w: 0.6001954}
-  m_LocalPosition: {x: -34.18, y: 63.06, z: -83.37}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1480375597850299794}
   - {fileID: 1480375597205017744}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 106.232, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!54 &1480375598502729156
 Rigidbody:
   m_ObjectHideFlags: 0

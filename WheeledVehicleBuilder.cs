@@ -17,30 +17,33 @@ public class WheeledVehicleBuilder : UdonSharpBehaviour
     WheeledVehicleController linkedController;
     Transform[] wheelMeshes;
 
+    const int minWheels = 4;
+    const int maxWheels = 12;
+
+    public int MinWheels { get { return minWheels; } }
+    public int MaxWheels { get { return maxWheels; } }
+
     //Bulid parameters:
     //-----------------
 
     //Vehicle
-    [UdonSynced(UdonSyncMode.None)] float mass;
-    [UdonSynced(UdonSyncMode.None)] float widthWithWheels;
-    [UdonSynced(UdonSyncMode.None)] float length;
-    [UdonSynced(UdonSyncMode.None)] Vector2 centerOfMassPositionRelativeToCenterBottom;
-    [UdonSynced(UdonSyncMode.None)] Vector2 driverStationPositionRelativeToCenterBottom;
+    [UdonSynced(UdonSyncMode.None)] public float mass;
+    [UdonSynced(UdonSyncMode.None)] public float widthWithWheels;
+    [UdonSynced(UdonSyncMode.None)] public float length;
+    [UdonSynced(UdonSyncMode.None)] public Vector3 centerOfMassPositionRelativeToCenterBottom;
+    [UdonSynced(UdonSyncMode.None)] public Vector3 driverStationPositionRelativeToCenterBottom;
 
     //Wheels
-    [UdonSynced(UdonSyncMode.None)] int numberOfWheels; //Divisible by 2, min = 4
-    [UdonSynced(UdonSyncMode.None)] float wheelRadius;
-    [UdonSynced(UdonSyncMode.None)] float motorTorquePerDrivenWheel;
-    [UdonSynced(UdonSyncMode.None)] float breakTorquePerWheel;
-    [UdonSynced(UdonSyncMode.None)] bool[] drivenWheelPairs; //Lenght = numberOfWheels / 2
-    [UdonSynced(UdonSyncMode.None)] float[] steeringAngleDeg; //Lenght = numberOfWheels / 2
+    [UdonSynced(UdonSyncMode.None)] public int numberOfWheels; //Divisible by 2, min = 4
+    [UdonSynced(UdonSyncMode.None)] public float wheelRadius;
+    [UdonSynced(UdonSyncMode.None)] public float motorTorquePerDrivenWheel;
+    [UdonSynced(UdonSyncMode.None)] public float breakTorquePerWheel;
+    [UdonSynced(UdonSyncMode.None)] public readonly bool[] drivenWheelPairs = new bool[maxWheels];
+    [UdonSynced(UdonSyncMode.None)] public readonly float[] steeringAngleDeg = new float[maxWheels];
 
     public void Setup(WheeledVehicleController linkedController)
     {
         this.linkedController = linkedController;
-
-        drivenWheelPairs = new bool[0];
-        steeringAngleDeg = new float[0];
 
         wheelColliders = new WheelCollider[0];
 
@@ -52,15 +55,21 @@ public class WheeledVehicleBuilder : UdonSharpBehaviour
         mass = 1000;
         widthWithWheels = 2;
         length = 2;
-        centerOfMassPositionRelativeToCenterBottom = 0.5f * Vector2.up;
-        driverStationPositionRelativeToCenterBottom = 0.5f * Vector2.up;
+        centerOfMassPositionRelativeToCenterBottom = 0.5f * Vector3.up;
+        driverStationPositionRelativeToCenterBottom = 0.5f * Vector3.up;
 
         numberOfWheels = 6;
         wheelRadius = 0.5f;
         motorTorquePerDrivenWheel = 200;
         breakTorquePerWheel = 500;
-        drivenWheelPairs = new bool[] { true, true, true };
-        steeringAngleDeg = new float[] { 10, 0, -10 };
+
+        drivenWheelPairs[0] = true;
+        drivenWheelPairs[1] = true;
+        drivenWheelPairs[2] = true;
+
+        steeringAngleDeg[0] = 10;
+        steeringAngleDeg[1] = 0;
+        steeringAngleDeg[2] = -10;
     }
 
     void ValidateBuildParameters()
@@ -74,32 +83,6 @@ public class WheeledVehicleBuilder : UdonSharpBehaviour
         if (numberOfWheels < 4)
         {
             numberOfWheels = 4;
-        }
-
-        //Verify driven wheel array
-        if (drivenWheelPairs.Length != numberOfWheels / 2)
-        {
-            bool[] newDrivenWheelsArray = new bool[numberOfWheels / 2];
-
-            for (int i = 0; i < newDrivenWheelsArray.Length; i++)
-            {
-                newDrivenWheelsArray[i] = drivenWheelPairs.Length > i ? drivenWheelPairs[i] : false;
-            }
-
-            drivenWheelPairs = newDrivenWheelsArray;
-        }
-
-        //Verify steering angle array
-        if (steeringAngleDeg.Length != numberOfWheels / 2)
-        {
-            float[] newsteeringAngleArray = new float[numberOfWheels / 2];
-
-            for (int i = 0; i < newsteeringAngleArray.Length; i++)
-            {
-                newsteeringAngleArray[i] = steeringAngleDeg.Length > i ? steeringAngleDeg[i] : 0;
-            }
-
-            steeringAngleDeg = newsteeringAngleArray;
         }
 
         //Check if numbers positive
