@@ -23,7 +23,7 @@ public class VehicleController : UdonSharpBehaviour
     public bool active = false;
     Transform[] wheelMeshes;
 
-    public VehicleStates currentVehicleState { get; private set; } = VehicleStates.inactive;
+    public VehicleStates CurrentVehicleState { get; private set; } = VehicleStates.inactive;
 
     //-------------------
 
@@ -140,10 +140,8 @@ public class VehicleController : UdonSharpBehaviour
     {
         for(int i = 0; i < wheelColliders.Length; i++)
         {
-            Vector3 position;
-            Quaternion rotation;
 
-            wheelColliders[i].GetWorldPose(out position, out rotation);
+            wheelColliders[i].GetWorldPose(out Vector3 position, out Quaternion rotation);
 
             wheelMeshes[i].SetPositionAndRotation(position, rotation);
         }
