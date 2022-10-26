@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c333ccfdd0cbdbc4ca30cef2dd6e6b9b, type: 3}
   m_Name: VehicleController
   m_EditorClassIdentifier: 
-  serializedUdonProgramAsset: {fileID: 11400000, guid: 0dee95a179aa41141a8612d9aea8c743,
+  serializedUdonProgramAsset: {fileID: 11400000, guid: db622cace8054b142bafa95f39bc1662,
     type: 2}
   udonAssembly: 
   assemblyError: 
