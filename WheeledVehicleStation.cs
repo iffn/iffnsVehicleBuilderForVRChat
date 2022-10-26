@@ -5,9 +5,9 @@ using VRC.SDKBase;
 using VRC.Udon;
 
 [RequireComponent(typeof(VRCStation))]
-public class VehicleStation : UdonSharpBehaviour
+public class WheeledVehicleStation : UdonSharpBehaviour
 {
-    [HideInInspector] public VehicleController linkedVehicle;
+    [HideInInspector] public WheeledVehicleController linkedVehicle;
     VRCStation linkedVRCStaion;
     bool seated = false;
 

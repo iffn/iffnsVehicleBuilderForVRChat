@@ -6,15 +6,15 @@ using VRC.SDKBase;
 using VRC.Udon;
 
 [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
-public class VehicleBuilder : UdonSharpBehaviour
+public class WheeledVehicleBuilder : UdonSharpBehaviour
 {
     //Parameters to be set in Unity
-    [SerializeField] VehicleStation DriverStaion;
+    [SerializeField] WheeledVehicleStation DriverStaion;
     [SerializeField] WheelCollider WheelPrefab;
 
     //Runtime parameters
     WheelCollider[] wheelColliders;
-    VehicleController linkedController;
+    WheeledVehicleController linkedController;
     Transform[] wheelMeshes;
 
     //Bulid parameters:
@@ -32,14 +32,14 @@ public class VehicleBuilder : UdonSharpBehaviour
     [UdonSynced(UdonSyncMode.None)] float wheelRadius;
     [UdonSynced(UdonSyncMode.None)] float motorTorquePerDrivenWheel;
     [UdonSynced(UdonSyncMode.None)] float breakTorquePerWheel;
-    [UdonSynced(UdonSyncMode.None)] bool[] drivenWheels; //Lenght = numberOfWheels / 2
+    [UdonSynced(UdonSyncMode.None)] bool[] drivenWheelPairs; //Lenght = numberOfWheels / 2
     [UdonSynced(UdonSyncMode.None)] float[] steeringAngleDeg; //Lenght = numberOfWheels / 2
 
-    public void Setup(VehicleController linkedController)
+    public void Setup(WheeledVehicleController linkedController)
     {
         this.linkedController = linkedController;
 
-        drivenWheels = new bool[0];
+        drivenWheelPairs = new bool[0];
         steeringAngleDeg = new float[0];
 
         wheelColliders = new WheelCollider[0];
@@ -59,7 +59,7 @@ public class VehicleBuilder : UdonSharpBehaviour
         wheelRadius = 0.5f;
         motorTorquePerDrivenWheel = 200;
         breakTorquePerWheel = 500;
-        drivenWheels = new bool[] { true, true, true };
+        drivenWheelPairs = new bool[] { true, true, true };
         steeringAngleDeg = new float[] { 10, 0, -10 };
     }
 
@@ -77,16 +77,16 @@ public class VehicleBuilder : UdonSharpBehaviour
         }
 
         //Verify driven wheel array
-        if (drivenWheels.Length != numberOfWheels / 2)
+        if (drivenWheelPairs.Length != numberOfWheels / 2)
         {
             bool[] newDrivenWheelsArray = new bool[numberOfWheels / 2];
 
             for (int i = 0; i < newDrivenWheelsArray.Length; i++)
             {
-                newDrivenWheelsArray[i] = drivenWheels.Length > i ? drivenWheels[i] : false;
+                newDrivenWheelsArray[i] = drivenWheelPairs.Length > i ? drivenWheelPairs[i] : false;
             }
 
-            drivenWheels = newDrivenWheelsArray;
+            drivenWheelPairs = newDrivenWheelsArray;
         }
 
         //Verify steering angle array
@@ -205,7 +205,7 @@ public class VehicleBuilder : UdonSharpBehaviour
             numberOfWheels: numberOfWheels,
             motorTorquePerDrivenWheel: motorTorquePerDrivenWheel,
             breakTorquePerWheel: breakTorquePerWheel,
-            drivenWheels: drivenWheels,
+            drivenWheels: drivenWheelPairs,
             steeringAngleDeg: steeringAngleDeg,
             wheelColliders: wheelColliders,
             wheelMeshes: wheelMeshes);

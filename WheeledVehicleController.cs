@@ -8,11 +8,11 @@ using VRC.Udon;
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(BoxCollider))]
 [UdonBehaviourSyncMode(BehaviourSyncMode.Continuous)]
-public class VehicleController : UdonSharpBehaviour
+public class WheeledVehicleController : UdonSharpBehaviour
 {
     //Unity assignments:
     
-    [SerializeField] VehicleBuilder LinkedBuilder;
+    [SerializeField] WheeledVehicleBuilder LinkedBuilder;
 
     //Runtime parameters:
 
