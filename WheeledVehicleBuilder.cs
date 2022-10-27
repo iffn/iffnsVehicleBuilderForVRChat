@@ -65,7 +65,7 @@ public class WheeledVehicleBuilder : UdonSharpBehaviour
         widthWithWheels = 2;
         length = 4;
         centerOfMassPositionRelativeToCenterBottom = 0.5f * Vector3.up;
-        driverStationPositionRelativeToCenterBottom = 0.5f * Vector3.up;
+        driverStationPositionRelativeToCenterBottom = new Vector3(0, 0.5f, 1);
 
         numberOfWheels = 6;
         wheelRadius = 0.5f;
@@ -225,9 +225,11 @@ public class WheeledVehicleBuilder : UdonSharpBehaviour
         linkedCollider.center = wheelRadius * Vector3.up;
 
         linkedController.LinkedRigidbody.mass = mass;
-        linkedController.LinkedRigidbody.centerOfMass = new Vector3(0, centerOfMassPositionRelativeToCenterBottom.y, centerOfMassPositionRelativeToCenterBottom.x);
+        linkedController.LinkedRigidbody.centerOfMass = centerOfMassPositionRelativeToCenterBottom;
 
-        DriverStaion.transform.localPosition = new Vector3(0, driverStationPositionRelativeToCenterBottom.y, driverStationPositionRelativeToCenterBottom.x); ;
+        DriverStaion.transform.localPosition = driverStationPositionRelativeToCenterBottom;
+
+        Debug.Log(driverStationPositionRelativeToCenterBottom.z);
 
         //Wheels:
         //-------

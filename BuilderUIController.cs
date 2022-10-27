@@ -68,9 +68,9 @@ public class BuilderUIController : UdonSharpBehaviour
             LinkedVehicleBuilder.centerOfMassPositionRelativeToCenterBottom = new Vector3(x, y, z);
         }
 
-        if (float.TryParse(CenterOfMassZInputField.text, out x)
-            && float.TryParse(CenterOfMassYInputField.text, out y)
-            && float.TryParse(CenterOfMassYInputField.text, out z))
+        if (float.TryParse(SteeringPositionXInputField.text, out x)
+            && float.TryParse(SteeringPositionYInputField.text, out y)
+            && float.TryParse(SteeringPositionZInputField.text, out z))
         {
             LinkedVehicleBuilder.driverStationPositionRelativeToCenterBottom = new Vector3(x, y, z);
         }
@@ -105,8 +105,6 @@ public class BuilderUIController : UdonSharpBehaviour
 
         for(int i = 0; i<LinkedVehicleBuilder.numberOfWheels  / 2; i++)
         {
-            Debug.Log(i);
-
             LinkedVehicleBuilder.drivenWheelPairs[i] = DrivenWheelInputField[i].isOn;
 
             if (float.TryParse(SteeringAngleInputField[i].text, out currentFloat))
