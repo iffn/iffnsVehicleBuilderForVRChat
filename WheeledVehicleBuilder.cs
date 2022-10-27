@@ -12,6 +12,13 @@ public class WheeledVehicleBuilder : UdonSharpBehaviour
     [SerializeField] WheeledVehicleStation DriverStaion;
     [SerializeField] WheelCollider WheelPrefab;
 
+    //Meshes
+    [SerializeField] GameObject CenterFrontTemplate;
+    [SerializeField] GameObject CenterMiddleTemplate;
+    [SerializeField] GameObject SideFrontTemplate;
+    [SerializeField] GameObject SideStraightTemplate;
+    [SerializeField] GameObject SideWheelOpeningTemplate;
+
     //Runtime parameters
     WheelCollider[] wheelColliders;
     WheeledVehicleController linkedController;
@@ -22,6 +29,8 @@ public class WheeledVehicleBuilder : UdonSharpBehaviour
 
     public int MinWheels { get { return minWheels; } }
     public int MaxWheels { get { return maxWheels; } }
+
+    float wheelWidth = 0.4f;
 
     //Bulid parameters:
     //-----------------
@@ -54,7 +63,7 @@ public class WheeledVehicleBuilder : UdonSharpBehaviour
     {
         mass = 1000;
         widthWithWheels = 2;
-        length = 3;
+        length = 4;
         centerOfMassPositionRelativeToCenterBottom = 0.5f * Vector3.up;
         driverStationPositionRelativeToCenterBottom = 0.5f * Vector3.up;
 
@@ -67,9 +76,9 @@ public class WheeledVehicleBuilder : UdonSharpBehaviour
         drivenWheelPairs[1] = true;
         drivenWheelPairs[2] = true;
 
-        steeringAngleDeg[0] = 10;
+        steeringAngleDeg[0] = -10;
         steeringAngleDeg[1] = 0;
-        steeringAngleDeg[2] = -10;
+        steeringAngleDeg[2] = 10;
     }
 
     void ValidateBuildParameters()
@@ -102,10 +111,113 @@ public class WheeledVehicleBuilder : UdonSharpBehaviour
         BuildVehiclesBasedOnBuildParameters();
     }
 
+    GameObject[] BodyMeshes = new GameObject[0];
+
+    void BuildBody()
+    {
+        //Cleanup body
+        for(int i = 0; i<BodyMeshes.Length; i++)
+        {
+            Destroy(BodyMeshes[i]);
+        }
+
+        int numberOfMeshes = numberOfWheels + numberOfWheels - 2 + 6 + 2; //Wheel openings, between wheels, front, center
+
+        BodyMeshes = new GameObject[numberOfMeshes];
+
+        int currentMeshCount = 0;
+
+
+        float firstWheelPosition = length * 0.5f - wheelRadius;
+        float distanceBetweenWheels = (length - wheelRadius * 2) / (numberOfWheels / 2 - 1);
+        float betweenDistance = distanceBetweenWheels - wheelRadius * 2;
+
+        //Wheel openings:
+        for (int i = 0; i < numberOfWheels; i++)
+        {
+            GameObject wheelOpening = Instantiate(SideWheelOpeningTemplate, transform);
+
+            BodyMeshes[currentMeshCount++] = wheelOpening;
+
+            float sideMultiplicator = 1 - 2 * (i % 2); //1 if even, -1 if uneven
+
+            wheelOpening.transform.localScale = new Vector3(sideMultiplicator, wheelRadius * 2, wheelRadius * 2);
+
+            int symetricArrayIndex = i / 2;
+
+            float forwardPosition = symetricArrayIndex * distanceBetweenWheels - firstWheelPosition;
+
+            wheelOpening.transform.localPosition =new Vector3((widthWithWheels * 0.5f - wheelWidth) * sideMultiplicator, wheelRadius, forwardPosition);
+        }
+
+        //Between wheels:
+        for (int i = 0; i < numberOfWheels - 2; i++)
+        {
+            GameObject sideStraight = Instantiate(SideStraightTemplate, transform);
+
+            BodyMeshes[currentMeshCount++] = sideStraight;
+
+            float sideMultiplicator = 1 - 2 * (i % 2);
+
+            sideStraight.transform.localScale = new Vector3(sideMultiplicator, betweenDistance, wheelRadius * 2);
+
+            int symetricArrayIndex = i / 2;
+
+            float forwardPosition = symetricArrayIndex * distanceBetweenWheels - firstWheelPosition + wheelRadius;
+
+            sideStraight.transform.localPosition = new Vector3((widthWithWheels * 0.5f - wheelWidth) * sideMultiplicator, wheelRadius, forwardPosition);
+        }
+
+        //Floor:
+        GameObject floor = Instantiate(CenterMiddleTemplate, transform);
+        BodyMeshes[currentMeshCount++] = floor;
+        floor.transform.localPosition = new Vector3(0, wheelRadius, 0);
+        floor.transform.localScale = new Vector3(widthWithWheels * 0.5f - wheelWidth, length, wheelRadius * 2);
+
+        /*
+        floor = Instantiate(floor, transform);
+        BodyMeshes[currentMeshCount++] = floor;
+        floor.transform.localScale = new Vector3(-floor.transform.localScale.x, floor.transform.localScale.y, floor.transform.localScale.z);
+        */
+
+        //Front and back middle:
+        GameObject frontMiddle = Instantiate(CenterFrontTemplate, transform);
+        BodyMeshes[currentMeshCount++] = frontMiddle;
+        frontMiddle.transform.localPosition = new Vector3(0, wheelRadius, length * 0.5f);
+        frontMiddle.transform.localScale = new Vector3(widthWithWheels * 0.5f - wheelWidth, frontMiddle.transform.localScale.y, wheelRadius * 2);
+
+        GameObject backMiddle = Instantiate(frontMiddle, transform);
+        BodyMeshes[currentMeshCount++] = backMiddle;
+        frontMiddle.transform.localPosition = new Vector3(0, wheelRadius, -length * 0.5f);
+        backMiddle.transform.localScale = new Vector3(backMiddle.transform.localScale.x, -backMiddle.transform.localScale.y, backMiddle.transform.localScale.z);
+
+        GameObject backRight = Instantiate(SideFrontTemplate, transform);
+        BodyMeshes[currentMeshCount++] = backRight;
+        backRight.transform.localPosition = new Vector3(widthWithWheels * 0.5f - wheelWidth, wheelRadius, -length * 0.5f);
+        backRight.transform.localScale = new Vector3(1, backRight.transform.localScale.y, wheelRadius * 2);
+
+        GameObject backLeft = Instantiate(backRight, transform);
+        BodyMeshes[currentMeshCount++] = backLeft;
+        backLeft.transform.localPosition = new Vector3(-backRight.transform.localPosition.x, backRight.transform.localPosition.y, backRight.transform.localPosition.z);
+        backLeft.transform.localScale = new Vector3(-backRight.transform.localScale.x, backRight.transform.localScale.y, backRight.transform.localScale.z);
+
+        GameObject frontRight = Instantiate(backRight, transform);
+        BodyMeshes[currentMeshCount++] = frontRight;
+        frontRight.transform.localPosition = new Vector3(backRight.transform.localPosition.x, backRight.transform.localPosition.y, -backRight.transform.localPosition.z);
+        frontRight.transform.localScale = new Vector3(backRight.transform.localScale.x, -backRight.transform.localScale.y, backRight.transform.localScale.z);
+
+        GameObject frontLeft = Instantiate(backLeft, transform);
+        BodyMeshes[currentMeshCount++] = frontLeft;
+        frontLeft.transform.localPosition = new Vector3(backLeft.transform.localPosition.x, backLeft.transform.localPosition.y, -backLeft.transform.localPosition.z);
+        frontLeft.transform.localScale = new Vector3(backLeft.transform.localScale.x, -backLeft.transform.localScale.y, backLeft.transform.localScale.z);
+    }
+
     public void BuildVehiclesBasedOnBuildParameters()
     {
         //Body:
         //-----
+
+        BuildBody();
 
         BoxCollider linkedCollider = linkedController.transform.GetComponent<BoxCollider>();
 
@@ -165,8 +277,8 @@ public class WheeledVehicleBuilder : UdonSharpBehaviour
         }
 
         //Set wheel parameters
-        float firstWheelPosition = length * 0.5f;
-        float distanceBetweenWheels = length / (numberOfWheels / 2 - 1);
+        float firstWheelPosition = -length * 0.5f + wheelRadius;
+        float distanceBetweenWheels = -(length - wheelRadius * 2) / (numberOfWheels / 2 - 1);
 
         for (int i = 0; i < numberOfWheels; i++)
         {
@@ -178,7 +290,7 @@ public class WheeledVehicleBuilder : UdonSharpBehaviour
 
             float forwardPosition = symetricArrayIndex * distanceBetweenWheels - firstWheelPosition;
 
-            wheelMeshes[i].localScale = new Vector3(wheelRadius * 2, wheelMeshes[i].localScale.y, wheelRadius * 2);
+            wheelMeshes[i].localScale = new Vector3(wheelMeshes[i].localScale.x, wheelRadius * 2, wheelRadius * 2);
 
             wheelColliders[i].transform.localPosition = new Vector3(widthWithWheels * 0.5f * sideMultiplicator, wheelRadius, forwardPosition);
 

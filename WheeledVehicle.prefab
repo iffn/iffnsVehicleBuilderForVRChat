@@ -52,10 +52,116 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
-    SerializationNodes: []
+    SerializationNodes:
+    - Name: drivenWheelPairs
+      Entry: 7
+      Data: 0|System.Boolean[], mscorlib
+    - Name: 
+      Entry: 14
+      Data: 12
+    - Name: 
+      Entry: 5
+      Data: false
+    - Name: 
+      Entry: 5
+      Data: false
+    - Name: 
+      Entry: 5
+      Data: false
+    - Name: 
+      Entry: 5
+      Data: false
+    - Name: 
+      Entry: 5
+      Data: false
+    - Name: 
+      Entry: 5
+      Data: false
+    - Name: 
+      Entry: 5
+      Data: false
+    - Name: 
+      Entry: 5
+      Data: false
+    - Name: 
+      Entry: 5
+      Data: false
+    - Name: 
+      Entry: 5
+      Data: false
+    - Name: 
+      Entry: 5
+      Data: false
+    - Name: 
+      Entry: 5
+      Data: false
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: steeringAngleDeg
+      Entry: 7
+      Data: 1|System.Single[], mscorlib
+    - Name: 
+      Entry: 14
+      Data: 12
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
   _udonSharpBackingUdonBehaviour: {fileID: 1480375597205017747}
   DriverStaion: {fileID: 1480375597850299799}
   WheelPrefab: {fileID: 324374023685153349, guid: 86e4b812dd180ed4f9a4cb491a6735c9,
+    type: 3}
+  CenterFrontTemplate: {fileID: 969110833813015648, guid: 1b29f8ed0bbefc84d8e59a658d182e16,
+    type: 3}
+  CenterMiddleTemplate: {fileID: -8041919676053325343, guid: 1b29f8ed0bbefc84d8e59a658d182e16,
+    type: 3}
+  SideFrontTemplate: {fileID: -2694552119862044646, guid: 1b29f8ed0bbefc84d8e59a658d182e16,
+    type: 3}
+  SideStraightTemplate: {fileID: 6354546203137523883, guid: 1b29f8ed0bbefc84d8e59a658d182e16,
+    type: 3}
+  SideWheelOpeningTemplate: {fileID: -7926632601145159068, guid: 1b29f8ed0bbefc84d8e59a658d182e16,
     type: 3}
   mass: 0
   widthWithWheels: 0
@@ -66,8 +172,6 @@ MonoBehaviour:
   wheelRadius: 0
   motorTorquePerDrivenWheel: 0
   breakTorquePerWheel: 0
-  drivenWheelPairs: 
-  steeringAngleDeg: []
 --- !u!114 &1480375597205017747
 MonoBehaviour:
   m_ObjectHideFlags: 0
