@@ -9,7 +9,15 @@ public class WheeledVehicleStation : UdonSharpBehaviour
 {
     [HideInInspector] public WheeledVehicleController linkedVehicle;
     VRCStation linkedVRCStaion;
-    bool seated = false;
+
+    VRCPlayerApi seatedPlayer;
+    public VRCPlayerApi SeatedPlayer
+    {
+        get
+        {
+            return seatedPlayer;
+        }
+    }
 
     private void Start()
     {
@@ -32,29 +40,21 @@ public class WheeledVehicleStation : UdonSharpBehaviour
 
     public override void OnStationEntered(VRCPlayerApi player)
     {
-        if (player.isLocal)
-        {
-            linkedVehicle.Active = true;
-            seated = true;
-        }
-        else
-        {
-            linkedVehicle.Active = false;
-        }
+        seatedPlayer = player;
+
+        linkedVehicle.EnteredDriverSeat();
     }
 
     public override void OnStationExited(VRCPlayerApi player)
     {
-        if (player.isLocal)
-        {
-            linkedVehicle.Active = false;
-            seated = false;
-        }
+        seatedPlayer = null;
+
+        linkedVehicle.ExitedDriverSeat();
     }
 
     private void Update()
     {
-        if (seated)
+        if (seatedPlayer != null && seatedPlayer.isLocal)
         {
             if (Input.GetKeyDown(KeyCode.Return))
             {
@@ -65,7 +65,7 @@ public class WheeledVehicleStation : UdonSharpBehaviour
 
     public override void InputJump(bool value, VRC.Udon.Common.UdonInputEventArgs args)
     {
-        if (Networking.LocalPlayer.IsUserInVR() && seated)
+        if (Networking.LocalPlayer.IsUserInVR() && seatedPlayer.isLocal)
         {
             linkedVRCStaion.ExitStation(Networking.LocalPlayer);
         }

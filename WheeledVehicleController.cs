@@ -11,26 +11,75 @@ using VRC.Udon;
 public class WheeledVehicleController : UdonSharpBehaviour
 {
     //Unity assignments:
-    
-    [SerializeField] WheeledVehicleBuilder LinkedBuilder;
+    [SerializeField] WheeledVehicleBuilder linkedVehicleBuilder;
+    [SerializeField] WheeledVehicleStation linkedDriverStation;
+    [SerializeField] WheeledVehicleSync linkedVehicleSync;
+
+    public WheeledVehicleBuilder LinkedVehicleBuilder
+    {
+        get
+        {
+            return linkedVehicleBuilder;
+        }
+    }
+
+    public WheeledVehicleSync LinkedVehicleSync
+    {
+        get
+        {
+            return linkedVehicleSync;
+        }
+    }
 
     //Runtime parameters:
-
     float driveInput = 0;
     float steeringInput = 0;
     float breakingInput = 1;
 
-    bool active = false;
-
-    public bool Active
+    bool vehcileIsOwned;
+    public bool VehicleIsOwned
     {
         get
         {
-            return active;
+            return vehcileIsOwned;
         }
         set
         {
-            active = value;
+            vehcileIsOwned = value;
+            SetRigidbodyActiveBasedOnParameters();
+        }
+    }
+
+
+
+    void SetRigidbodyActiveBasedOnParameters()
+    {
+        LinkedRigidbody.isKinematic = !vehcileIsOwned;
+    }
+
+    public void EnteredDriverSeat()
+    {
+        if (vehcileIsOwned)
+        {
+            beingDrivenLocally = true;
+        }
+    }
+
+    public void ExitedDriverSeat()
+    {
+        BeingDrivenLocally = false;
+    }
+
+    bool beingDrivenLocally = false;
+    public bool BeingDrivenLocally
+    {
+        get
+        {
+            return beingDrivenLocally;
+        }
+        set
+        {
+            beingDrivenLocally = value;
 
             if (!value)
             {
@@ -41,14 +90,14 @@ public class WheeledVehicleController : UdonSharpBehaviour
 
     Transform[] wheelMeshes;
 
-    public VehicleStates CurrentVehicleState { get; private set; } = VehicleStates.inactive;
+    //public VehicleStates CurrentVehicleState { get; private set; } = VehicleStates.inactive;
 
     //-------------------
 
     public Rigidbody LinkedRigidbody { get; private set; }
 
     //Parts
-    WheelCollider[] wheelColliders;
+    WheelCollider[] wheelColliders = new WheelCollider[0];
 
     //Vehicle parameters
 
@@ -150,15 +199,19 @@ public class WheeledVehicleController : UdonSharpBehaviour
     {
         Setup();
 
+        linkedVehicleSync.Setup(this);
+
         //Setup builder
-        LinkedBuilder.Setup(linkedController: this);
+        linkedVehicleBuilder.Setup(linkedController: this);
 
         if (Networking.IsMaster)
         {
-            LinkedBuilder.SetInitialParameters();
+            linkedVehicleBuilder.SetInitialParameters();
         }
 
-        LinkedBuilder.BuildVehiclesBasedOnBuildParameters();
+        linkedVehicleBuilder.BuildVehiclesBasedOnBuildParameters();
+
+        VehicleIsOwned = Networking.IsOwner(linkedVehicleSync.gameObject);
     }
 
     void UpdateWheelMeshPosition()
@@ -174,7 +227,7 @@ public class WheeledVehicleController : UdonSharpBehaviour
 
     private void Update()
     {
-        if (Active)
+        if (BeingDrivenLocally)
         {
             Control();
         }
@@ -183,11 +236,27 @@ public class WheeledVehicleController : UdonSharpBehaviour
 
         Drive();
     }
+
+    public void ClaimOwnership()
+    {
+        if (Networking.IsOwner(linkedVehicleSync.gameObject)) return;
+        if (linkedDriverStation.SeatedPlayer != null) return;
+
+        Networking.SetOwner(Networking.LocalPlayer, linkedVehicleSync.gameObject);
+        Networking.SetOwner(Networking.LocalPlayer, linkedVehicleBuilder.gameObject);
+
+        if (linkedDriverStation.SeatedPlayer.isLocal)
+        {
+            beingDrivenLocally = true;
+        }
+    }
 }
 
+/*
 public enum VehicleStates
 {
     inactive,
-    ownedLocally,
+    beingDrivenLocally,
     synced
 }
+*/

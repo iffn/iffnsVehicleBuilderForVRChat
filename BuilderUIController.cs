@@ -5,10 +5,12 @@ using UnityEngine;
 using UnityEngine.UI;
 using VRC.SDKBase;
 using VRC.Udon;
+using static System.Net.Mime.MediaTypeNames;
 
 public class BuilderUIController : UdonSharpBehaviour
 {
-    [SerializeField] WheeledVehicleBuilder LinkedVehicleBuilder;
+    [SerializeField] WheeledVehicleController LinkedVehicle;
+    WheeledVehicleBuilder LinkedVehicleBuilder;
 
     [SerializeField] InputField MassInputField;
     [SerializeField] InputField widthWithWheelsInputField;
@@ -27,6 +29,9 @@ public class BuilderUIController : UdonSharpBehaviour
     [SerializeField] Toggle[] DrivenWheelInputField;
     [SerializeField] InputField[] SteeringAngleInputField;
 
+    [SerializeField] Button ClaimOwnershipButton;
+    [SerializeField] UnityEngine.UI.Text CurrentOwnerName;
+
     public void UpdateInputArrays()
     {
         for (int i = 0; i < LinkedVehicleBuilder.MaxWheels / 2; i++)
@@ -40,6 +45,12 @@ public class BuilderUIController : UdonSharpBehaviour
 
     public void UpdateVehicleFromUI()
     {
+        if (!Networking.IsOwner(LinkedVehicleBuilder.gameObject))
+        {
+            UpdateUIFromVehicle();
+            return;
+        }
+
         float currentFloat;
         int currentInt;
         float x, y, z;
@@ -116,13 +127,62 @@ public class BuilderUIController : UdonSharpBehaviour
         LinkedVehicleBuilder.BuildVehiclesBasedOnBuildParameters();
     }
 
-    void UpdateUIFromVehicle()
+    public void UpdateUIFromVehicle()
     {
+        MassInputField.text = LinkedVehicleBuilder.mass.ToString();
+        widthWithWheelsInputField.text = LinkedVehicleBuilder.widthWithWheels.ToString();
+        lengthInputField.text = LinkedVehicleBuilder.length.ToString();
+        CenterOfMassXInputField.text = LinkedVehicleBuilder.centerOfMassPositionRelativeToCenterBottom.x.ToString();
+        CenterOfMassYInputField.text = LinkedVehicleBuilder.centerOfMassPositionRelativeToCenterBottom.y.ToString();
+        CenterOfMassZInputField.text = LinkedVehicleBuilder.centerOfMassPositionRelativeToCenterBottom.z.ToString();
+        SteeringPositionXInputField.text = LinkedVehicleBuilder.driverStationPositionRelativeToCenterBottom.x.ToString();
+        SteeringPositionYInputField.text = LinkedVehicleBuilder.driverStationPositionRelativeToCenterBottom.y.ToString();
+        SteeringPositionZInputField.text = LinkedVehicleBuilder.driverStationPositionRelativeToCenterBottom.z.ToString();
 
+        NumberOfWheelsInputField.text = LinkedVehicleBuilder.numberOfWheels.ToString();
+        WheelRadiusInputField.text = LinkedVehicleBuilder.wheelRadius.ToString();
+        MotorTorqueInputField.text = LinkedVehicleBuilder.motorTorquePerDrivenWheel.ToString();
+        BreakTorqueInputField.text = LinkedVehicleBuilder.breakTorquePerWheel.ToString();
+
+        for (int i = 0; i < DrivenWheelInputField.Length; i++)
+        {
+            DrivenWheelInputField[i].isOn = LinkedVehicleBuilder.drivenWheelPairs[i];
+            SteeringAngleInputField[i].text = LinkedVehicleBuilder.steeringAngleDeg[i].ToString();
+        }
+
+        /*
+        if (SteeringAngleInputField == null)
+        {
+            Debug.LogWarning($"{nameof(SteeringAngleInputField)} not yet created");
+        }
+        else if (SteeringAngleInputField == null)
+        {
+            Debug.LogWarning($"{nameof(LinkedVehicleBuilder.steeringAngleDeg)} not yet created");
+        }
+        else
+        {
+            
+        }
+        */
+    }
+
+    public void SetVehicleOwnerDisplay(VRCPlayerApi owner)
+    {
+        ClaimOwnershipButton.gameObject.SetActive(!owner.isLocal);
+
+        CurrentOwnerName.text = owner.playerId + ": " + owner.displayName;
+    }
+
+    public void ClaimOwnership()
+    {
+        LinkedVehicle.ClaimOwnership();
     }
 
     void Start()
     {
-        
+        SetVehicleOwnerDisplay(Networking.GetOwner(LinkedVehicle.LinkedVehicleSync.gameObject));
+        LinkedVehicleBuilder = LinkedVehicle.LinkedVehicleBuilder;
+        LinkedVehicleBuilder.LinkedUI = this;
+        SendCustomEventDelayedSeconds(nameof(UpdateVehicleFromUI), 1);
     }
 }

@@ -18,6 +18,7 @@ public class WheeledVehicleBuilder : UdonSharpBehaviour
     [SerializeField] GameObject SideFrontTemplate;
     [SerializeField] GameObject SideStraightTemplate;
     [SerializeField] GameObject SideWheelOpeningTemplate;
+    public BuilderUIController LinkedUI; //For updating vehicle during sync;
 
     //Runtime parameters
     WheelCollider[] wheelColliders;
@@ -108,7 +109,15 @@ public class WheeledVehicleBuilder : UdonSharpBehaviour
 
     public override void OnDeserialization()
     {
+        Debug.LogWarning("Receiving build parameters");
+
         BuildVehiclesBasedOnBuildParameters();
+
+        Debug.LogWarning("Updating UI");
+
+        LinkedUI.UpdateUIFromVehicle();
+
+        Debug.LogWarning("Deserialization complete");
     }
 
     GameObject[] BodyMeshes = new GameObject[0];
@@ -121,7 +130,7 @@ public class WheeledVehicleBuilder : UdonSharpBehaviour
             Destroy(BodyMeshes[i]);
         }
 
-        int numberOfMeshes = numberOfWheels + numberOfWheels - 2 + 6 + 2; //Wheel openings, between wheels, front, center
+        int numberOfMeshes = numberOfWheels + numberOfWheels - 2 + 6 + 2 + 20; //Wheel openings, between wheels, front, center
 
         BodyMeshes = new GameObject[numberOfMeshes];
 
@@ -214,6 +223,14 @@ public class WheeledVehicleBuilder : UdonSharpBehaviour
 
     public void BuildVehiclesBasedOnBuildParameters()
     {
+        Debug.LogWarning("Building vehicle according to parameters");
+
+        if (Networking.IsOwner(gameObject))
+        {
+            Debug.LogWarning("Sending build parameters");
+            RequestSerialization();
+        }
+
         //Body:
         //-----
 
