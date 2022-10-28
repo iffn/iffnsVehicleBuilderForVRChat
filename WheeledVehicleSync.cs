@@ -9,6 +9,7 @@ public class WheeledVehicleSync : UdonSharpBehaviour
 {
     [UdonSynced(UdonSyncMode.Smooth)] Vector3 Position;
     [UdonSynced (UdonSyncMode.Smooth)] Quaternion Rotation;
+    [UdonSynced (UdonSyncMode.Smooth)] public float[] verticalWheelPosition = new float[12];
 
     WheeledVehicleController linkedVehicle;
     Transform linkedVehicleTransform;
@@ -43,6 +44,8 @@ public class WheeledVehicleSync : UdonSharpBehaviour
         {
             Position = linkedVehicleTransform.position;
             Rotation = linkedVehicleTransform.localRotation;
+
+            verticalWheelPosition = linkedVehicle.GetWheelColliderHeight();
         }
         else
         {

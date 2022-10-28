@@ -98,6 +98,20 @@ public class WheeledVehicleController : UdonSharpBehaviour
     //Parts
     WheelCollider[] wheelColliders = new WheelCollider[0];
 
+    public float[] GetWheelColliderHeight()
+    {
+        float[] returnValue = new float[12];
+
+        for(int i = 0; i<wheelColliders.Length; i++)
+        {
+            wheelColliders[i].GetWorldPose(out Vector3 pos, out Quaternion quat);
+
+            returnValue[i] = wheelColliders[i].transform.InverseTransformPoint(pos).y;
+        }
+
+        return returnValue;
+    }
+
     //Vehicle parameters
 
     int numberOfWheels;
@@ -259,7 +273,7 @@ public class WheeledVehicleController : UdonSharpBehaviour
 
             //wheelMeshes[i].rotation = transform.rotation * Quaternion.Euler(new Vector3(assumedWheelRotation, steerAngle, 0));
             wheelMeshes[i].rotation = transform.rotation * Quaternion.Euler(new Vector3(0, steerAngle, 0));
-            wheelMeshes[i].localPosition = Vector3.zero;
+            wheelMeshes[i].localPosition = Vector3.up * LinkedVehicleSync.verticalWheelPosition[i];
         }
     }
 
