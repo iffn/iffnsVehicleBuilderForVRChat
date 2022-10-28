@@ -18,6 +18,23 @@ public class WheeledVehicleSync : UdonSharpBehaviour
         enabled = true;
         this.linkedVehicle = linkedVehicle;
         linkedVehicleTransform = linkedVehicle.transform;
+        linkedVehicle.VehicleIsOwned = Networking.IsOwner(gameObject);
+    }
+
+    float heading = 0;
+    float previousHeading = 0;
+
+    public float GetCaluclatedTurnRateIfSynced
+    {
+        get
+        {
+            return (heading - previousHeading) / Time.deltaTime;
+        }
+    }
+
+    void calculateHeading()
+    {
+        heading = Mathf.Atan2(transform.forward.z, transform.forward.x);
     }
 
     private void Update()
@@ -30,6 +47,9 @@ public class WheeledVehicleSync : UdonSharpBehaviour
         else
         {
             linkedVehicleTransform.SetPositionAndRotation(Position, Rotation);
+
+            previousHeading = heading;
+            calculateHeading();
         }
     }
 
@@ -38,5 +58,12 @@ public class WheeledVehicleSync : UdonSharpBehaviour
         linkedVehicle.VehicleIsOwned = player.isLocal;
 
         linkedVehicle.LinkedVehicleBuilder.LinkedUI.SetVehicleOwnerDisplay(player);
+
+        if (!player.isLocal)
+        {
+            //Reset heading values
+            calculateHeading();
+            previousHeading = heading;
+        }
     }
 }

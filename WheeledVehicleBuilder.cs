@@ -130,7 +130,7 @@ public class WheeledVehicleBuilder : UdonSharpBehaviour
             Destroy(BodyMeshes[i]);
         }
 
-        int numberOfMeshes = numberOfWheels + numberOfWheels - 2 + 6 + 2 + 20; //Wheel openings, between wheels, front, center
+        int numberOfMeshes = numberOfWheels + numberOfWheels - 2 + 6 + 2 + 20; //Wheel openings, between wheels, front, center, add 20 for safety
 
         BodyMeshes = new GameObject[numberOfMeshes];
 
@@ -264,9 +264,7 @@ public class WheeledVehicleBuilder : UdonSharpBehaviour
 
             for (int i = wheelColliders.Length; i < numberOfWheels; i++)
             {
-                newWheelColliderArray[i] = GameObject.Instantiate(WheelPrefab.gameObject).transform.GetComponent<WheelCollider>();
-                newWheelColliderArray[i].transform.parent = linkedController.transform;
-
+                newWheelColliderArray[i] = GameObject.Instantiate(WheelPrefab.gameObject, linkedController.transform).transform.GetComponent<WheelCollider>();
             }
 
             wheelColliders = newWheelColliderArray;

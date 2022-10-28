@@ -1,5 +1,4 @@
 ﻿
-using System.Linq.Expressions;
 using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
@@ -36,7 +35,7 @@ public class WheeledVehicleController : UdonSharpBehaviour
     float steeringInput = 0;
     float breakingInput = 1;
 
-    bool vehcileIsOwned;
+    bool vehcileIsOwned = true;
     public bool VehicleIsOwned
     {
         get
@@ -199,6 +198,8 @@ public class WheeledVehicleController : UdonSharpBehaviour
     {
         Setup();
 
+        UpdateWheelMeshPositionWhenOwner();
+
         linkedVehicleSync.Setup(this);
 
         //Setup builder
@@ -214,27 +215,77 @@ public class WheeledVehicleController : UdonSharpBehaviour
         VehicleIsOwned = Networking.IsOwner(linkedVehicleSync.gameObject);
     }
 
-    void UpdateWheelMeshPosition()
+    void UpdateWheelMeshPositionWhenOwner()
     {
         for(int i = 0; i < wheelColliders.Length; i++)
         {
-
             wheelColliders[i].GetWorldPose(out Vector3 position, out Quaternion rotation);
 
             wheelMeshes[i].SetPositionAndRotation(position, rotation);
         }
     }
 
+    //Wheel sync
+    public float wheelSyncAdjuster = 0.08f;
+    float assumedWheelRotation = 0;
+
+    public float forwardVelocityDebug;
+    public float turnRateDebug;
+    public float assumedSteeringInputDebug;
+
+    void UpdateWheelMeshPositionWhenNotOwned()
+    {
+        //float turnRate = transform.InverseTransformDirection(LinkedRigidbody.angularVelocity).y;
+        float turnRate = linkedVehicleSync.GetCaluclatedTurnRateIfSynced;
+
+        float forwardVelocity = transform.InverseTransformDirection(LinkedRigidbody.velocity).z;
+
+        float velocityDirection = (forwardVelocity > 0) ? 1 : -1;
+
+        float assumedSteeringInput = Mathf.Clamp(turnRate * Mathf.Rad2Deg * wheelSyncAdjuster * velocityDirection, -1, 1);
+        //Debug.Log(numberOfWheels);
+
+        assumedWheelRotation += forwardVelocity / linkedVehicleBuilder.wheelRadius * Time.deltaTime;
+
+        turnRateDebug = turnRate;
+        forwardVelocityDebug = forwardVelocity;
+        assumedSteeringInputDebug = assumedSteeringInput;
+
+        for (int i = 0; i < numberOfWheels; i++)
+        {
+            int symetricArrayIndex = i / 2;
+
+            float steerAngle = -steeringAngleDeg[symetricArrayIndex] * assumedSteeringInput;
+
+            //wheelMeshes[i].rotation = transform.rotation * Quaternion.Euler(new Vector3(assumedWheelRotation, steerAngle, 0));
+            wheelMeshes[i].rotation = transform.rotation * Quaternion.Euler(new Vector3(0, steerAngle, 0));
+            wheelMeshes[i].localPosition = Vector3.zero;
+        }
+    }
+
     private void Update()
     {
-        if (BeingDrivenLocally)
+        if (Input.GetKeyDown(KeyCode.End))
         {
-            Control();
+            Debug.Log($"{nameof(vehcileIsOwned)} = {vehcileIsOwned}");
+            Debug.Log($"{nameof(BeingDrivenLocally)} = {BeingDrivenLocally}");
         }
 
-        UpdateWheelMeshPosition();
+        if (VehicleIsOwned)
+        {
+            if (BeingDrivenLocally)
+            {
+                Control();
+            }
 
-        Drive();
+            UpdateWheelMeshPositionWhenOwner();
+
+            Drive();
+        }
+        else
+        {
+            UpdateWheelMeshPositionWhenNotOwned();
+        }
     }
 
     public void ClaimOwnership()
