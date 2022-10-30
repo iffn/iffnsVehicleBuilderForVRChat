@@ -56,8 +56,15 @@ public class WheeledVehicleSync : UdonSharpBehaviour
         }
     }
 
+    public void MakeLocalPlayerOwner()
+    {
+        Networking.SetOwner(Networking.LocalPlayer, gameObject);
+    }
+
     public override void OnOwnershipTransferred(VRCPlayerApi player)
     {
+        Debug.LogWarning("Ownership transfered to " + player.playerId + ":" + player.displayName);
+
         linkedVehicle.VehicleIsOwned = player.isLocal;
 
         linkedVehicle.LinkedVehicleBuilder.LinkedUI.SetVehicleOwnerDisplay(player);
@@ -70,3 +77,5 @@ public class WheeledVehicleSync : UdonSharpBehaviour
         }
     }
 }
+
+

@@ -58,10 +58,19 @@ public class WheeledVehicleController : UdonSharpBehaviour
 
     public void EnteredDriverSeat()
     {
-        if (vehcileIsOwned)
+        if (!vehcileIsOwned)
         {
-            beingDrivenLocally = true;
+            MakeLocalPlayerOwner();
         }
+
+        beingDrivenLocally = true;
+    }
+
+    public void MakeLocalPlayerOwner()
+    {
+        linkedVehicleSync.MakeLocalPlayerOwner();
+        linkedVehicleBuilder.MakeLocalPlayerOwner();
+        
     }
 
     public void ExitedDriverSeat()
@@ -304,13 +313,24 @@ public class WheeledVehicleController : UdonSharpBehaviour
 
     public void ClaimOwnership()
     {
-        if (Networking.IsOwner(linkedVehicleSync.gameObject)) return;
-        if (linkedDriverStation.SeatedPlayer != null) return;
+        Debug.LogWarning("Trying to claim  ownership");
 
-        Networking.SetOwner(Networking.LocalPlayer, linkedVehicleSync.gameObject);
-        Networking.SetOwner(Networking.LocalPlayer, linkedVehicleBuilder.gameObject);
+        if (Networking.IsOwner(linkedVehicleSync.gameObject))
+        {
+            Debug.LogWarning("   Already the vehicle owner");
+            return;
+        }
+        if (linkedDriverStation.StationOccupant == StationOccupantTypes.someoneElse)
+        {
+            Debug.LogWarning("   Someone else is sitting in the vehicle");
+            return;
+        }
 
-        if (linkedDriverStation.SeatedPlayer.isLocal)
+        Debug.LogWarning("   Making the local player the owner");
+
+        MakeLocalPlayerOwner();
+
+        if (linkedDriverStation.StationOccupant == StationOccupantTypes.me)
         {
             beingDrivenLocally = true;
         }

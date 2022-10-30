@@ -19,6 +19,25 @@ public class WheeledVehicleStation : UdonSharpBehaviour
         }
     }
 
+    public StationOccupantTypes StationOccupant
+    {
+        get
+        {
+            if (seatedPlayer == null)
+            {
+                return StationOccupantTypes.noone;
+            }
+            else if (seatedPlayer.isLocal)
+            {
+                return StationOccupantTypes.me;
+            }
+            else
+            {
+                return StationOccupantTypes.someoneElse;
+            }
+        }
+    }
+
     private void Start()
     {
         linkedVRCStaion = transform.GetComponent<VRCStation>();
@@ -42,7 +61,10 @@ public class WheeledVehicleStation : UdonSharpBehaviour
     {
         seatedPlayer = player;
 
-        linkedVehicle.EnteredDriverSeat();
+        if (player.isLocal)
+        {
+            linkedVehicle.EnteredDriverSeat();
+        }
     }
 
     public override void OnStationExited(VRCPlayerApi player)
@@ -70,4 +92,11 @@ public class WheeledVehicleStation : UdonSharpBehaviour
             linkedVRCStaion.ExitStation(Networking.LocalPlayer);
         }
     }
+}
+
+public enum StationOccupantTypes
+{
+    noone,
+    me,
+    someoneElse
 }

@@ -48,8 +48,8 @@ public class WheeledVehicleBuilder : UdonSharpBehaviour
     [UdonSynced(UdonSyncMode.None)] public float wheelRadius;
     [UdonSynced(UdonSyncMode.None)] public float motorTorquePerDrivenWheel;
     [UdonSynced(UdonSyncMode.None)] public float breakTorquePerWheel;
-    [UdonSynced(UdonSyncMode.None)] public readonly bool[] drivenWheelPairs = new bool[maxWheels];
-    [UdonSynced(UdonSyncMode.None)] public readonly float[] steeringAngleDeg = new float[maxWheels];
+    [UdonSynced(UdonSyncMode.None)] public readonly bool[] drivenWheelPairs = new bool[maxWheels / 2];
+    [UdonSynced(UdonSyncMode.None)] public readonly float[] steeringAngleDeg = new float[maxWheels / 2];
 
     public void Setup(WheeledVehicleController linkedController)
     {
@@ -58,6 +58,10 @@ public class WheeledVehicleBuilder : UdonSharpBehaviour
         wheelColliders = new WheelCollider[0];
 
         DriverStaion.linkedVehicle = linkedController;
+    }
+    public void MakeLocalPlayerOwner()
+    {
+        Networking.SetOwner(Networking.LocalPlayer, gameObject);
     }
 
     public void SetInitialParameters()

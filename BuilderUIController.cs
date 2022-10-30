@@ -32,6 +32,16 @@ public class BuilderUIController : UdonSharpBehaviour
     [SerializeField] Button ClaimOwnershipButton;
     [SerializeField] UnityEngine.UI.Text CurrentOwnerName;
 
+    bool editInProgress = false;
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Delete))
+        {
+            UpdateUIFromVehicle();
+        }
+    }
+
     public void UpdateInputArrays()
     {
         for (int i = 0; i < LinkedVehicleBuilder.MaxWheels / 2; i++)
@@ -45,9 +55,20 @@ public class BuilderUIController : UdonSharpBehaviour
 
     public void UpdateVehicleFromUI()
     {
+        if (editInProgress)
+        {
+            Debug.LogWarning("Edit in progress");
+            return;
+        }
+
+        editInProgress = true;
+
         if (!Networking.IsOwner(LinkedVehicleBuilder.gameObject))
         {
+            Debug.LogWarning("UpdateVehicleFromUI for non owner");
+
             UpdateUIFromVehicle();
+            editInProgress = false;
             return;
         }
 
@@ -125,10 +146,14 @@ public class BuilderUIController : UdonSharpBehaviour
         }
 
         LinkedVehicleBuilder.BuildVehiclesBasedOnBuildParameters();
+
+        editInProgress = false;
     }
 
     public void UpdateUIFromVehicle()
     {
+        Debug.LogWarning("UpdateUIFromVehicle");
+
         MassInputField.text = LinkedVehicleBuilder.mass.ToString();
         widthWithWheelsInputField.text = LinkedVehicleBuilder.widthWithWheels.ToString();
         lengthInputField.text = LinkedVehicleBuilder.length.ToString();
@@ -144,26 +169,38 @@ public class BuilderUIController : UdonSharpBehaviour
         MotorTorqueInputField.text = LinkedVehicleBuilder.motorTorquePerDrivenWheel.ToString();
         BreakTorqueInputField.text = LinkedVehicleBuilder.breakTorquePerWheel.ToString();
 
-        for (int i = 0; i < DrivenWheelInputField.Length; i++)
-        {
-            DrivenWheelInputField[i].isOn = LinkedVehicleBuilder.drivenWheelPairs[i];
-            SteeringAngleInputField[i].text = LinkedVehicleBuilder.steeringAngleDeg[i].ToString();
-        }
 
-        /*
-        if (SteeringAngleInputField == null)
+        if (DrivenWheelInputField == null)
         {
-            Debug.LogWarning($"{nameof(SteeringAngleInputField)} not yet created");
+            Debug.LogWarning($"{nameof(DrivenWheelInputField)} not yet created");
         }
         else if (SteeringAngleInputField == null)
         {
-            Debug.LogWarning($"{nameof(LinkedVehicleBuilder.steeringAngleDeg)} not yet created");
+            Debug.LogWarning($"{nameof(SteeringAngleInputField)} not yet created");
+        }
+        else if (LinkedVehicleBuilder.drivenWheelPairs.Length != DrivenWheelInputField.Length)
+        {
+            Debug.LogWarning($"{nameof(LinkedVehicleBuilder.drivenWheelPairs)} length not correct");
+            Debug.LogWarning($"   {nameof(LinkedVehicleBuilder.drivenWheelPairs)} length = {LinkedVehicleBuilder.drivenWheelPairs.Length}");
+            Debug.LogWarning($"   {nameof(DrivenWheelInputField)} length = {DrivenWheelInputField.Length}");
+        }
+        else if (LinkedVehicleBuilder.steeringAngleDeg.Length != DrivenWheelInputField.Length)
+        {
+            Debug.LogWarning($"{nameof(LinkedVehicleBuilder.steeringAngleDeg)} length 2 not correct");
+        }
+        else if (SteeringAngleInputField.Length != DrivenWheelInputField.Length)
+        {
+            Debug.LogWarning($"{nameof(SteeringAngleInputField)} length 2 not correct");
         }
         else
         {
-            
+            for (int i = 0; i < DrivenWheelInputField.Length; i++)
+            {
+                //DrivenWheelInputField[i].isOn = LinkedVehicleBuilder.drivenWheelPairs[i];
+                //SteeringAngleInputField[i].text = LinkedVehicleBuilder.steeringAngleDeg[i].ToString();
+            }
         }
-        */
+        
     }
 
     public void SetVehicleOwnerDisplay(VRCPlayerApi owner)
@@ -180,9 +217,13 @@ public class BuilderUIController : UdonSharpBehaviour
 
     void Start()
     {
+        Debug.LogWarning("Starting UI controller");
+
         SetVehicleOwnerDisplay(Networking.GetOwner(LinkedVehicle.LinkedVehicleSync.gameObject));
         LinkedVehicleBuilder = LinkedVehicle.LinkedVehicleBuilder;
         LinkedVehicleBuilder.LinkedUI = this;
+
+        Debug.LogWarning("UpdateVehicleFromUI in 1 second");
         SendCustomEventDelayedSeconds(nameof(UpdateVehicleFromUI), 1);
     }
 }
