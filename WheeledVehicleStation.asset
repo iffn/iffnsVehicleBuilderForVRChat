@@ -21,7 +21,7 @@ MonoBehaviour:
   compiledVersion: 2
   behaviourSyncMode: 0
   hasInteractEvent: 1
-  scriptID: -6324527714285852133
+  scriptID: 7550599235817237108
   serializationData:
     SerializedFormat: 2
     SerializedBytes: 
@@ -62,7 +62,7 @@ MonoBehaviour:
       Data: 3|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
-      Data: WheeledVehicleController, Assembly-CSharp
+      Data: iffnsStuff.iffnsVRCStuff.WheeledVehicles.WheeledVehicleController, Assembly-CSharp
     - Name: 
       Entry: 8
       Data: 

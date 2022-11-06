@@ -1,81 +1,94 @@
-﻿
-using UdonSharp;
+﻿using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
 
-[UdonBehaviourSyncMode(BehaviourSyncMode.Continuous)]
-public class WheeledVehicleSync : UdonSharpBehaviour
+namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 {
-    [UdonSynced(UdonSyncMode.Smooth)] Vector3 Position;
-    [UdonSynced (UdonSyncMode.Smooth)] Quaternion Rotation;
-    [UdonSynced (UdonSyncMode.Smooth)] public float[] verticalWheelPosition = new float[12];
-
-    WheeledVehicleController linkedVehicle;
-    Transform linkedVehicleTransform;
-
-    public void Setup(WheeledVehicleController linkedVehicle)
+    [UdonBehaviourSyncMode(BehaviourSyncMode.Continuous)]
+    public class WheeledVehicleSync : UdonSharpBehaviour
     {
-        enabled = true;
-        this.linkedVehicle = linkedVehicle;
-        linkedVehicleTransform = linkedVehicle.transform;
-        linkedVehicle.VehicleIsOwned = Networking.IsOwner(gameObject);
-    }
+        [UdonSynced(UdonSyncMode.Smooth)] Vector3 Position;
+        [UdonSynced(UdonSyncMode.Smooth)] Quaternion Rotation;
+        [UdonSynced(UdonSyncMode.Smooth)] public float[] verticalWheelPositions = new float[WheeledVehicleBuilder.maxWheels];
 
-    float heading = 0;
-    float previousHeading = 0;
+        WheeledVehicleController linkedVehicle;
+        Transform linkedVehicleTransform;
 
-    public float GetCaluclatedTurnRateIfSynced
-    {
-        get
+        float heading = 0;
+        float previousHeading = 0;
+
+        public bool VehicleIsOwned
         {
-            return (heading - previousHeading) / Time.deltaTime;
+            get
+            {
+                return Networking.IsOwner(gameObject);
+            }
         }
-    }
 
-    void calculateHeading()
-    {
-        heading = Mathf.Atan2(transform.forward.z, transform.forward.x);
-    }
+        public void Setup(WheeledVehicleController linkedVehicle)
+        {
+            enabled = true;
+            this.linkedVehicle = linkedVehicle;
+            linkedVehicleTransform = this.linkedVehicle.transform;
+        }
 
-    private void Update()
-    {
-        if (Networking.IsOwner(gameObject))
+
+        public float GetCaluclatedTurnRateIfSynced
+        {
+            get
+            {
+                previousHeading = heading;
+
+                heading = Mathf.Atan2(transform.forward.z, transform.forward.x);
+
+                return (heading - previousHeading) / Time.deltaTime;
+
+            }
+        }
+
+        void calculateHeading()
+        {
+            heading = Mathf.Atan2(transform.forward.z, transform.forward.x);
+        }
+
+        public void SyncLocationFromMe()
         {
             Position = linkedVehicleTransform.position;
             Rotation = linkedVehicleTransform.localRotation;
 
-            verticalWheelPosition = linkedVehicle.GetWheelColliderHeight();
+            verticalWheelPositions = linkedVehicle.GetWheelColliderHeight();
         }
-        else
+
+        public void SyncLocationPositionToMe()
         {
             linkedVehicleTransform.SetPositionAndRotation(Position, Rotation);
-
-            previousHeading = heading;
-            calculateHeading();
         }
-    }
 
-    public void MakeLocalPlayerOwner()
-    {
-        Networking.SetOwner(Networking.LocalPlayer, gameObject);
-    }
-
-    public override void OnOwnershipTransferred(VRCPlayerApi player)
-    {
-        Debug.LogWarning("Ownership transfered to " + player.playerId + ":" + player.displayName);
-
-        linkedVehicle.VehicleIsOwned = player.isLocal;
-
-        linkedVehicle.LinkedVehicleBuilder.LinkedUI.SetVehicleOwnerDisplay(player);
-
-        if (!player.isLocal)
+        private void Update()
         {
-            //Reset heading values
-            calculateHeading();
-            previousHeading = heading;
+            //Update controlled by vehicle controller
+        }
+
+        public void MakeLocalPlayerOwner()
+        {
+            Networking.SetOwner(Networking.LocalPlayer, gameObject);
+        }
+
+        public override void OnOwnershipTransferred(VRCPlayerApi player)
+        {
+            Debug.LogWarning("Ownership transfered to " + player.playerId + ":" + player.displayName);
+
+            linkedVehicle.UpdateParametersBasedOnOwnership();
+
+            linkedVehicle.LinkedUI.SetVehicleOwnerDisplay(player);
+
+            if (!player.isLocal)
+            {
+                //Reset heading values
+                calculateHeading();
+                previousHeading = heading;
+            }
         }
     }
 }
-
-
