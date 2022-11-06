@@ -55,7 +55,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         public void SyncLocationFromMe()
         {
             Position = linkedVehicleTransform.position;
-            Rotation = linkedVehicleTransform.localRotation;
+            Rotation = linkedVehicleTransform.rotation;
 
             verticalWheelPositions = linkedVehicle.GetWheelColliderHeight();
         }
