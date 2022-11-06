@@ -95,7 +95,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
         public override void InputJump(bool value, VRC.Udon.Common.UdonInputEventArgs args)
         {
-            if (Networking.LocalPlayer.IsUserInVR() && seatedPlayer.isLocal)
+            if (seatedPlayer != null && Networking.LocalPlayer.IsUserInVR() && seatedPlayer.isLocal)
             {
                 linkedVRCStaion.ExitStation(Networking.LocalPlayer);
             }

@@ -2,6 +2,7 @@
 using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
+using VRC.Udon.Common;
 
 namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 {
@@ -14,6 +15,9 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         [SerializeField] WheeledVehicleBuilder linkedVehicleBuilder;
         [SerializeField] WheeledVehicleStation linkedDriverStation;
         [SerializeField] WheeledVehicleSync linkedVehicleSync;
+        [SerializeField] VRSteeringWheel LinkedVRSteeringWheelControlls;
+        [SerializeField] Transform LinkedSteeringWheelVisualizer;
+
         public BuilderUIController LinkedUI; //For updating vehicle during sync;
 
         public Rigidbody LinkedRigidbody { get; private set; }
@@ -27,10 +31,13 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         WheelCollider[] wheelColliders = new WheelCollider[0];
         Transform[] wheelMeshes = new Transform[0];
 
+        Vector2 rightJoystickInput;
+        Vector2 leftJoystickInput;
+
         //Runtime parameters:
         float driveInput = 0;
         float steeringInput = 0;
-        float breakingInput = 1;
+        float brakingInput = 1;
 
         public float wheelSyncAdjuster = 0.08f;
         float assumedWheelRotation = 0;
@@ -69,11 +76,25 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             }
 
             beingDrivenLocally = true;
+
+            if (Networking.LocalPlayer.IsUserInVR())
+            {
+                LinkedVRSteeringWheelControlls.gameObject.SetActive(true);
+            }
+
+            LinkedVRSteeringWheelControlls.SetSteeringWheelPositionRelativeToPlayer();
         }
 
         public void ExitedDriverSeat()
         {
             BeingDrivenLocally = false;
+
+            if (Networking.LocalPlayer.IsUserInVR())
+            {
+                LinkedVRSteeringWheelControlls.gameObject.SetActive(false);
+
+                LinkedVRSteeringWheelControlls.DropIfHeld();
+            }
         }
 
         bool beingDrivenLocally = false;
@@ -142,7 +163,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
                 wheelColliders[i].steerAngle = steeringAngleDeg[symetricArrayIndex] * steeringInput;
 
-                wheelColliders[i].brakeTorque = breakTorquePerWheel * breakingInput;
+                wheelColliders[i].brakeTorque = breakTorquePerWheel * brakingInput;
             }
         }
 
@@ -150,17 +171,25 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         {
             driveInput = 0;
             steeringInput = 0;
-            breakingInput = 1;
+            brakingInput = 1;
         }
 
         void Control()
         {
+            driveInput = 0;
+            brakingInput = 0;
+            steeringInput = 0;
+
+            if (Networking.LocalPlayer.IsUserInVR())
+            {
+                applyVRControls();
+            }
+
             if (Input.GetKeyDown(KeyCode.Return))
             {
                 LinkedRigidbody.constraints = RigidbodyConstraints.None;
             }
 
-            driveInput = 0;
 
             if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
             {
@@ -170,8 +199,6 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             {
                 driveInput--;
             }
-
-            steeringInput = 0;
 
             if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
             {
@@ -184,13 +211,52 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
             if (Input.GetKey(KeyCode.Space))
             {
-                breakingInput = 1;
+                brakingInput = 1;
             }
-            else
-            {
-                breakingInput = 0;
-            }
+
+            LinkedSteeringWheelVisualizer.localRotation = Quaternion.Euler(0, 0, steeringInput * Mathf.Rad2Deg);
         }
+
+        void applyVRControls()
+        {
+            //Check hand: Return if not held, otherwise get drive and brake inputs
+            switch (LinkedVRSteeringWheelControlls.currentHand)
+            {
+                case VRC_Pickup.PickupHand.None:
+                    return;
+                    break;
+                case VRC_Pickup.PickupHand.Left:
+                    driveInput = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger");
+                    brakingInput = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger");
+                    if(rightJoystickInput.y > 0)
+                    {
+                        driveInput = Mathf.Clamp01(driveInput + rightJoystickInput.y);
+                    }
+                    else
+                    {
+                        brakingInput = Mathf.Clamp01(brakingInput - rightJoystickInput.y);
+                    }
+                    break;
+                case VRC_Pickup.PickupHand.Right:
+                    driveInput = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger");
+                    brakingInput = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger");
+                    if (leftJoystickInput.y > 0)
+                    {
+                        driveInput = Mathf.Clamp01(driveInput + leftJoystickInput.y);
+                    }
+                    else
+                    {
+                        brakingInput = Mathf.Clamp01(brakingInput - leftJoystickInput.y);
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            LinkedVRSteeringWheelControlls.UpdateControlls();
+            steeringInput = LinkedVRSteeringWheelControlls.SteeringAngle;
+        }
+
 
         void Start()
         {
@@ -222,6 +288,12 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             }
 
             //Setup
+            LinkedVRSteeringWheelControlls.gameObject.SetActive(Networking.LocalPlayer.IsUserInVR());
+
+            if (Networking.LocalPlayer.IsUserInVR())
+            {
+                LinkedVRSteeringWheelControlls.Setup();
+            }
 
             LinkedRigidbody = transform.GetComponent<Rigidbody>();
 
@@ -339,6 +411,28 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             linkedVehicleSync.MakeLocalPlayerOwner();
             linkedVehicleBuilder.MakeLocalPlayerOwner();
 
+        }
+
+        //index right hand joystck
+        public override void InputLookVertical(float value, UdonInputEventArgs args)
+        {
+            rightJoystickInput.y = value;
+        }
+
+        public override void InputLookHorizontal(float value, UdonInputEventArgs args)
+        {
+            rightJoystickInput.x = value;
+        }
+
+        //index left hand joystck
+        public override void InputMoveVertical(float value, UdonInputEventArgs args)
+        {
+            leftJoystickInput.y = value;
+        }
+
+        public override void InputMoveHorizontal(float value, UdonInputEventArgs args)
+        {
+            leftJoystickInput.x = value;
         }
     }
 }
