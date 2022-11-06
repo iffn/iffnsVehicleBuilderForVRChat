@@ -311,6 +311,8 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             if (Networking.IsMaster)
             {
                 linkedVehicleBuilder.SetInitialParameters();
+
+                LinkedUI.UpdateUIFromVehicle();
             }
 
             linkedVehicleBuilder.BuildVehicleBasedOnBuildParameters();

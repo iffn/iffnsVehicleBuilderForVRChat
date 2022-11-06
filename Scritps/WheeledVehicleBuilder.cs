@@ -18,7 +18,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         [SerializeField] GameObject SideFrontTemplate;
         [SerializeField] GameObject SideStraightTemplate;
         [SerializeField] GameObject SideWheelOpeningTemplate;
-
+        [SerializeField] PresetVehicleTypes initialVehicleType;
 
         //Runtime parameters
         WheelCollider[] wheelColliders = new WheelCollider[0];
@@ -64,23 +64,69 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         public void SetInitialParameters()
         {
             mass = 1000;
-            widthWithWheels = 2;
-            length = 4;
-            centerOfMassPositionRelativeToCenterBottom = 0.5f * Vector3.up;
-            driverStationPositionRelativeToCenterBottom = new Vector3(0, 0.5f, 1);
 
-            numberOfWheels = 6;
-            wheelRadius = 0.5f;
-            motorTorquePerDrivenWheel = 200;
-            breakTorquePerWheel = 500;
+            switch (initialVehicleType)
+            {
+                case PresetVehicleTypes.ATV6Wheel:
 
-            drivenWheelPairs[0] = true;
-            drivenWheelPairs[1] = true;
-            drivenWheelPairs[2] = true;
+                    widthWithWheels = 2;
+                    length = 3.2f;
+                    centerOfMassPositionRelativeToCenterBottom = 0.5f * Vector3.up;
+                    driverStationPositionRelativeToCenterBottom = new Vector3(0, 0.5f, 1);
 
-            steeringAngleDeg[0] = -10;
-            steeringAngleDeg[1] = 0;
-            steeringAngleDeg[2] = 10;
+                    numberOfWheels = 6;
+                    wheelRadius = 0.5f;
+                    motorTorquePerDrivenWheel = 200;
+                    breakTorquePerWheel = 500;
+
+                    drivenWheelPairs[0] = true;
+                    drivenWheelPairs[1] = true;
+                    drivenWheelPairs[2] = true;
+
+                    steeringAngleDeg[0] = -10;
+                    steeringAngleDeg[1] = 0;
+                    steeringAngleDeg[2] = 10;
+
+                    break;
+                case PresetVehicleTypes.Car:
+                    widthWithWheels = 1.8f;
+                    length = 4.5f;
+                    centerOfMassPositionRelativeToCenterBottom = 0.5f * Vector3.up;
+                    driverStationPositionRelativeToCenterBottom = new Vector3(-0.3f, 0.5f, 1.3f);
+
+                    numberOfWheels = 4;
+                    wheelRadius = 0.5f;
+                    motorTorquePerDrivenWheel = 400;
+                    breakTorquePerWheel = 500;
+
+                    drivenWheelPairs[0] = true;
+                    drivenWheelPairs[1] = true;
+                    drivenWheelPairs[2] = true;
+
+                    steeringAngleDeg[0] = -25;
+                    break;
+                case PresetVehicleTypes.Monstertruck:
+                    widthWithWheels = 6.8f;
+                    length = 8.6f;
+                    centerOfMassPositionRelativeToCenterBottom = 0.5f * Vector3.up;
+                    driverStationPositionRelativeToCenterBottom = new Vector3(0, 2.5f, 3.5f);
+
+                    numberOfWheels = 4;
+                    wheelRadius = 1.5f;
+                    motorTorquePerDrivenWheel = 1500;
+                    breakTorquePerWheel = 3000;
+
+                    drivenWheelPairs[0] = true;
+                    drivenWheelPairs[1] = false;
+
+                    steeringAngleDeg[0] = -15;
+                    steeringAngleDeg[1] = 15;
+                    break;
+                default:
+                    break;
+            }
+
+            
         }
 
         void ValidateBuildParameters()
@@ -323,5 +369,12 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                 wheelMeshes: wheelMeshes);
         }
 
+    }
+
+    public enum PresetVehicleTypes
+    {
+        ATV6Wheel,
+        Car,
+        Monstertruck
     }
 }
