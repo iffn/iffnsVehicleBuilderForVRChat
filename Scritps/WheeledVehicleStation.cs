@@ -11,6 +11,14 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         [HideInInspector] public WheeledVehicleController linkedVehicle;
         VRCStation linkedVRCStaion;
 
+        public bool EnableCollider
+        {
+            set
+            {
+                transform.GetComponent<Collider>().enabled = value;
+            }
+        }
+
         VRCPlayerApi seatedPlayer;
         public VRCPlayerApi SeatedPlayer
         {

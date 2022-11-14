@@ -1,4 +1,5 @@
-﻿using UdonSharp;
+﻿using Newtonsoft.Json.Linq;
+using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
@@ -45,6 +46,37 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         public float forwardVelocityDebug;
         public float turnRateDebug;
         public float assumedSteeringInputDebug;
+
+        public bool FixVehicle
+        {
+            set
+            {
+                foreach(WheelCollider wheel in wheelColliders)
+                {
+                    wheel.enabled = !value;
+                }
+
+                transform.GetComponent<BoxCollider>().enabled = !value;
+
+                LinkedRigidbody.isKinematic = value;
+                LinkedRigidbody.velocity = Vector3.zero;
+                LinkedRigidbody.angularVelocity = Vector3.zero;
+
+                linkedDriverStation.EnableCollider = !value;
+            }
+        }
+
+        Vector3 originalLocalPosition;
+        Quaternion originalLocalRotation;
+
+        public void RespawnVehicle()
+        {
+            LinkedRigidbody.velocity = Vector3.zero;
+            LinkedRigidbody.angularVelocity = Vector3.zero;
+
+            transform.localPosition = originalLocalPosition;
+            transform.localRotation = originalLocalRotation;
+        }
 
         public WheeledVehicleBuilder LinkedVehicleBuilder
         {
@@ -318,6 +350,9 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             linkedVehicleBuilder.BuildVehicleBasedOnBuildParameters();
 
             UpdateParametersBasedOnOwnership();
+
+            originalLocalPosition = transform.localPosition;
+            originalLocalRotation = transform.localRotation;
         }
 
         void UpdateWheelMeshPositionWhenOwner()

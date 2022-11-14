@@ -31,14 +31,29 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         [SerializeField] Button ClaimOwnershipButton;
         [SerializeField] UnityEngine.UI.Text CurrentOwnerName;
 
+        [SerializeField] Toggle FixVehicleToggle;
+        [SerializeField] Toggle UseCustomMeshToggle;
+
         bool editInProgress = false;
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.Delete))
-            {
-                UpdateUIFromVehicle();
-            }
+
+        }
+
+        public void RespawnVehicle()
+        {
+            linkedVehicle.RespawnVehicle();
+        }
+
+        public void ToggleFixVehicle()
+        {
+            linkedVehicle.FixVehicle = FixVehicleToggle.isOn;
+        }
+
+        public void ToggleUseCustomMesh()
+        {
+            linkedVehicleBuilder.UseCustomMesh = UseCustomMeshToggle.isOn;
         }
 
         public void UpdateInputArrays()
@@ -151,8 +166,6 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
         public void UpdateUIFromVehicle()
         {
-            Debug.LogWarning("UpdateUIFromVehicle");
-
             MassInputField.text = linkedVehicleBuilder.mass.ToString();
             widthWithWheelsInputField.text = linkedVehicleBuilder.widthWithWheels.ToString();
             lengthInputField.text = linkedVehicleBuilder.length.ToString();
@@ -216,12 +229,12 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
         public void Setup(WheeledVehicleController linkedVehicle)
         {
-            Debug.LogWarning("Setting up UI controller");
-
             this.linkedVehicle = linkedVehicle;
             linkedVehicleBuilder = linkedVehicle.LinkedVehicleBuilder;
 
             SetVehicleOwnerDisplay(Networking.GetOwner(this.linkedVehicle.LinkedVehicleSync.gameObject));
+
+            ToggleUseCustomMesh();
         }
 
         void Start()

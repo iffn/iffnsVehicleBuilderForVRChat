@@ -19,6 +19,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         [SerializeField] GameObject SideStraightTemplate;
         [SerializeField] GameObject SideWheelOpeningTemplate;
         [SerializeField] PresetVehicleTypes initialVehicleType;
+        [SerializeField] MeshBuilder CustomBodyMesh;
 
         //Runtime parameters
         WheelCollider[] wheelColliders = new WheelCollider[0];
@@ -49,6 +50,25 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         [UdonSynced(UdonSyncMode.None)] public float breakTorquePerWheel;
         [UdonSynced(UdonSyncMode.None)] public readonly bool[] drivenWheelPairs = new bool[maxWheels / 2];
         [UdonSynced(UdonSyncMode.None)] public readonly float[] steeringAngleDeg = new float[maxWheels / 2];
+
+        public bool UseCustomMesh
+        {
+            set
+            {
+                foreach(GameObject body in BodyMeshes)
+                {
+                    if(body == null)
+                    {
+                        Debug.Log("Body mesh element null -> Wrong count calculation?");
+                        continue;
+                    }
+
+                    body.SetActive(!value);
+                }
+
+                CustomBodyMesh.gameObject.SetActive(value);
+            }
+        }
 
         public void Setup(WheeledVehicleController linkedController)
         {
@@ -125,8 +145,6 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                 default:
                     break;
             }
-
-            
         }
 
         void ValidateBuildParameters()
@@ -175,12 +193,11 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                 Destroy(BodyMeshes[i]);
             }
 
-            int numberOfMeshes = numberOfWheels + numberOfWheels - 2 + 6 + 2 + 20; //Wheel openings, between wheels, front, center, add 20 for safety
+            int numberOfMeshes = numberOfWheels + numberOfWheels - 2 + 1 + 3 + 3; //Wheel openings, between wheels, center, front, back
 
             BodyMeshes = new GameObject[numberOfMeshes];
 
             int currentMeshCount = 0;
-
 
             float firstWheelPosition = length * 0.5f - wheelRadius;
             float distanceBetweenWheels = (length - wheelRadius * 2) / (numberOfWheels / 2 - 1);
@@ -268,11 +285,8 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
         public void BuildVehicleBasedOnBuildParameters()
         {
-            Debug.LogWarning("Building vehicle according to parameters");
-
             if (Networking.IsOwner(gameObject))
             {
-                Debug.LogWarning("Sending build parameters");
                 RequestSerialization();
             }
 
@@ -290,8 +304,6 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             linkedController.LinkedRigidbody.centerOfMass = centerOfMassPositionRelativeToCenterBottom;
 
             DriverStaion.transform.localPosition = driverStationPositionRelativeToCenterBottom;
-
-            Debug.Log(driverStationPositionRelativeToCenterBottom.z);
 
             //Wheels:
             //-------
