@@ -47,14 +47,27 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         public float turnRateDebug;
         public float assumedSteeringInputDebug;
 
-        public bool FixVehicle
+        bool vehicleFixed = false;
+        public bool VehicleFixed
         {
+            get
+            {
+                return vehicleFixed;
+            }
             set
             {
                 foreach(WheelCollider wheel in wheelColliders)
                 {
                     wheel.enabled = !value;
                 }
+
+                /*
+                foreach(Transform wheelMesh in wheelMeshes)
+                {
+                    wheelMesh.localPosition = Vector3.zero;
+                    wheelMesh.localRotation = Quaternion.identity;
+                }
+                */
 
                 transform.GetComponent<BoxCollider>().enabled = !value;
 
@@ -63,6 +76,8 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                 LinkedRigidbody.angularVelocity = Vector3.zero;
 
                 linkedDriverStation.EnableCollider = !value;
+
+                vehicleFixed = value;
             }
         }
 
@@ -357,11 +372,14 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
         void UpdateWheelMeshPositionWhenOwner()
         {
-            for (int i = 0; i < wheelColliders.Length; i++)
+            if (!vehicleFixed)
             {
-                wheelColliders[i].GetWorldPose(out Vector3 position, out Quaternion rotation);
+                for (int i = 0; i < wheelColliders.Length; i++)
+                {
+                    wheelColliders[i].GetWorldPose(out Vector3 position, out Quaternion rotation);
 
-                wheelMeshes[i].SetPositionAndRotation(position, rotation);
+                    wheelMeshes[i].SetPositionAndRotation(position, rotation);
+                }
             }
         }
 

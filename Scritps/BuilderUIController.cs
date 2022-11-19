@@ -31,8 +31,11 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         [SerializeField] Button ClaimOwnershipButton;
         [SerializeField] UnityEngine.UI.Text CurrentOwnerName;
 
+        [SerializeField] Button RespawnButton;
+
         [SerializeField] Toggle FixVehicleToggle;
         [SerializeField] Toggle UseCustomMeshToggle;
+        [SerializeField] MeshBuilderInterface CustomMeshInterface;
 
         bool editInProgress = false;
 
@@ -48,11 +51,13 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
         public void ToggleFixVehicle()
         {
-            linkedVehicle.FixVehicle = FixVehicleToggle.isOn;
+            linkedVehicle.VehicleFixed = FixVehicleToggle.isOn;
         }
 
         public void ToggleUseCustomMesh()
         {
+            CustomMeshInterface.gameObject.SetActive(UseCustomMeshToggle.isOn);
+
             linkedVehicleBuilder.UseCustomMesh = UseCustomMeshToggle.isOn;
         }
 
@@ -217,7 +222,11 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
         public void SetVehicleOwnerDisplay(VRCPlayerApi owner)
         {
-            ClaimOwnershipButton.gameObject.SetActive(!owner.isLocal);
+            bool locallyOwned = owner.isLocal;
+
+            ClaimOwnershipButton.gameObject.SetActive(!locallyOwned);
+            RespawnButton.gameObject.SetActive(locallyOwned);
+            FixVehicleToggle.transform.parent.gameObject.SetActive(locallyOwned);
 
             CurrentOwnerName.text = owner.playerId + ": " + owner.displayName;
         }

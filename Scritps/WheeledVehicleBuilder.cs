@@ -51,6 +51,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         [UdonSynced(UdonSyncMode.None)] public readonly bool[] drivenWheelPairs = new bool[maxWheels / 2];
         [UdonSynced(UdonSyncMode.None)] public readonly float[] steeringAngleDeg = new float[maxWheels / 2];
 
+        bool useCustomMesh = false;
         public bool UseCustomMesh
         {
             set
@@ -67,6 +68,12 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                 }
 
                 CustomBodyMesh.gameObject.SetActive(value);
+
+                useCustomMesh = value;
+            }
+            get
+            {
+                return useCustomMesh;
             }
         }
 
@@ -110,12 +117,12 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                     break;
                 case PresetVehicleTypes.Car:
                     widthWithWheels = 1.8f;
-                    length = 4.5f;
+                    length = 3f;
                     centerOfMassPositionRelativeToCenterBottom = 0.5f * Vector3.up;
-                    driverStationPositionRelativeToCenterBottom = new Vector3(-0.3f, 0.5f, 1.3f);
+                    driverStationPositionRelativeToCenterBottom = new Vector3(-0.3f, 0.5f, .6f);
 
                     numberOfWheels = 4;
-                    wheelRadius = 0.5f;
+                    wheelRadius = 0.4f;
                     motorTorquePerDrivenWheel = 400;
                     breakTorquePerWheel = 500;
 
@@ -281,6 +288,11 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             BodyMeshes[currentMeshCount++] = frontLeft;
             frontLeft.transform.localPosition = new Vector3(backLeft.transform.localPosition.x, backLeft.transform.localPosition.y, -backLeft.transform.localPosition.z);
             frontLeft.transform.localScale = new Vector3(backLeft.transform.localScale.x, -backLeft.transform.localScale.y, backLeft.transform.localScale.z);
+
+            foreach(GameObject bodyMesh in BodyMeshes)
+            {
+                bodyMesh.SetActive(!useCustomMesh);
+            }
         }
 
         public void BuildVehicleBasedOnBuildParameters()
