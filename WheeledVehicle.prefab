@@ -59,7 +59,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 84bd75fbd5f7576408eee667a281da62, type: 2}
+  - {fileID: 2100000, guid: 381c69598f2f9d3439e2e76830bc7aed, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -413,7 +413,6 @@ MonoBehaviour:
     type: 3}
   initialVehicleType: 1
   CustomBodyMesh: {fileID: 5279270190411762809}
-  GeneratePrefabBody: 0
   mass: 0
   widthWithWheels: 0
   length: 0
@@ -811,7 +810,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7219213577104748122}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d6ae1cf09acad844c9eded8be55bfdd4, type: 3}
   m_Name: 
@@ -826,19 +825,6 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 3087700076258527307}
-  verticalWheelPositions:
-  - 0
-  - 0
-  - 0
-  - 0
-  - 0
-  - 0
-  - 0
-  - 0
-  - 0
-  - 0
-  - 0
-  - 0
 --- !u!114 &3087700076258527307
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -846,7 +832,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7219213577104748122}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 45115577ef41a5b4ca741ed302693907, type: 3}
   m_Name: 
@@ -998,6 +984,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1480375597205017744}
     m_Modifications:
+    - target: {fileID: 533554195697283724, guid: 4587af1411a250b46a19a3e18e45d5eb,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3502828741474572845, guid: 4587af1411a250b46a19a3e18e45d5eb,
         type: 3}
       propertyPath: serializationData.Prefab

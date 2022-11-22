@@ -83,6 +83,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
             DriverStaion.linkedVehicle = linkedController;
         }
+
         public void MakeLocalPlayerOwner()
         {
             Networking.SetOwner(Networking.LocalPlayer, gameObject);
@@ -154,42 +155,68 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             }
         }
 
-        void ValidateBuildParameters()
+        bool usesValidBuildParameters()
         {
             //Verify wheel cound
             if (numberOfWheels % 2 != 0)
             {
-                numberOfWheels--;
+                return false;
+                
             }
 
             if (numberOfWheels < minWheels)
             {
-                numberOfWheels = minWheels;
+                return false;
             }
 
             //Check if numbers positive
             if (wheelRadius < 0)
             {
-                wheelRadius = -wheelRadius;
+                return false;
             }
 
             if (breakTorquePerWheel < 0)
             {
-                breakTorquePerWheel = -breakTorquePerWheel;
+                return false;
             }
+
+            return true;
         }
 
         public override void OnDeserialization()
         {
             Debug.LogWarning("Receiving build parameters");
 
+            BuildFromParameters();
+        }
+
+        public void BuildFromParameters()
+        {
             BuildVehicleBasedOnBuildParameters();
 
-            Debug.LogWarning("Updating UI");
-
             linkedController.LinkedUI.UpdateUIFromVehicle();
+        }
 
-            Debug.LogWarning("Deserialization complete");
+        public void DelayedBuild()
+        {
+            if (usesValidBuildParameters())
+            {
+                Debug.LogWarning("Parameters useful, building vehicle");
+
+
+                BuildVehicleBasedOnBuildParameters();
+
+                Debug.LogWarning("Updating UI");
+
+                linkedController.LinkedUI.UpdateUIFromVehicle();
+
+                Debug.LogWarning("Deserialization complete");
+            }
+            else
+            {
+                Debug.LogWarning("Parameters not useful! Sending delayed event");
+                SendCustomEventDelayedFrames(nameof(DelayedBuild), 0);
+            }
         }
         
         void BuildBody()
@@ -201,6 +228,8 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             }
 
             int numberOfMeshes = numberOfWheels + numberOfWheels - 2 + 1 + 3 + 3; //Wheel openings, between wheels, center, front, back
+
+            Debug.LogWarning($"Building mesh with {numberOfMeshes} meshes using {numberOfWheels} wheels");
 
             BodyMeshes = new GameObject[numberOfMeshes];
 
@@ -279,16 +308,31 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             backLeft.transform.localPosition = new Vector3(-backRight.transform.localPosition.x, backRight.transform.localPosition.y, backRight.transform.localPosition.z);
             backLeft.transform.localScale = new Vector3(-backRight.transform.localScale.x, backRight.transform.localScale.y, backRight.transform.localScale.z);
 
-            GameObject frontRight = Instantiate(backRight, transform);
-            BodyMeshes[currentMeshCount++] = frontRight;
-            frontRight.transform.localPosition = new Vector3(backRight.transform.localPosition.x, backRight.transform.localPosition.y, -backRight.transform.localPosition.z);
-            frontRight.transform.localScale = new Vector3(backRight.transform.localScale.x, -backRight.transform.localScale.y, backRight.transform.localScale.z);
+            if(currentMeshCount <= numberOfMeshes)
+            {
+                GameObject frontRight = Instantiate(backRight, transform);
 
-            GameObject frontLeft = Instantiate(backLeft, transform);
-            BodyMeshes[currentMeshCount++] = frontLeft;
-            frontLeft.transform.localPosition = new Vector3(backLeft.transform.localPosition.x, backLeft.transform.localPosition.y, -backLeft.transform.localPosition.z);
-            frontLeft.transform.localScale = new Vector3(backLeft.transform.localScale.x, -backLeft.transform.localScale.y, backLeft.transform.localScale.z);
+                BodyMeshes[currentMeshCount++] = frontRight;
+                frontRight.transform.localPosition = new Vector3(backRight.transform.localPosition.x, backRight.transform.localPosition.y, -backRight.transform.localPosition.z);
+                frontRight.transform.localScale = new Vector3(backRight.transform.localScale.x, -backRight.transform.localScale.y, backRight.transform.localScale.z);
+            }
+            else
+            {
+                Debug.LogWarning($"Out of bounds 1 while building mesh with {numberOfMeshes} meshes using {numberOfWheels} wheels");
+            }
 
+            if (currentMeshCount <= numberOfMeshes)
+            {
+                GameObject frontLeft = Instantiate(backLeft, transform);
+                BodyMeshes[currentMeshCount++] = frontLeft;
+                frontLeft.transform.localPosition = new Vector3(backLeft.transform.localPosition.x, backLeft.transform.localPosition.y, -backLeft.transform.localPosition.z);
+                frontLeft.transform.localScale = new Vector3(backLeft.transform.localScale.x, -backLeft.transform.localScale.y, backLeft.transform.localScale.z);
+            }
+            else
+            {
+                Debug.LogWarning($"Out of bounds 2 while building mesh with {numberOfMeshes} meshes using {numberOfWheels} wheels");
+            }
+            
             foreach(GameObject bodyMesh in BodyMeshes)
             {
                 bodyMesh.SetActive(!useCustomMesh);

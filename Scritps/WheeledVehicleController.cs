@@ -355,14 +355,11 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
             //Setup builder
 
-            if (Networking.IsMaster)
-            {
-                linkedVehicleBuilder.SetInitialParameters();
+            linkedVehicleBuilder.SetInitialParameters();
 
-                LinkedUI.UpdateUIFromVehicle();
-            }
+            LinkedUI.UpdateUIFromVehicle();
 
-            linkedVehicleBuilder.BuildVehicleBasedOnBuildParameters();
+            linkedVehicleBuilder.BuildFromParameters();
 
             UpdateParametersBasedOnOwnership();
 
@@ -409,7 +406,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
                 //wheelMeshes[i].rotation = transform.rotation * Quaternion.Euler(new Vector3(assumedWheelRotation, steerAngle, 0));
                 wheelMeshes[i].rotation = transform.rotation * Quaternion.Euler(new Vector3(0, steerAngle, 0));
-                wheelMeshes[i].localPosition = Vector3.up * LinkedVehicleSync.verticalWheelPositions[i];
+                //wheelMeshes[i].localPosition = Vector3.up * LinkedVehicleSync.verticalWheelPositions[i];
             }
         }
 
@@ -431,6 +428,8 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             else
             {
                 linkedVehicleSync.SyncLocationPositionToMe();
+
+                //linkedVehicleSync.updateArrayFromSync();
 
                 UpdateWheelMeshPositionWhenNotOwned();
             }
