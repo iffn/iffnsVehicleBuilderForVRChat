@@ -103,8 +103,6 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
         public void SyncLocationFromMe()
         {
-            Debug.Log("Syncing position from me: " + linkedVehicleTransform.position);
-
             Position = linkedVehicleTransform.position;
             Rotation = linkedVehicleTransform.rotation;
 
@@ -113,7 +111,6 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
         public void SyncLocationPositionToMe()
         {
-            Debug.Log("Syncing position to me: " + Position);
             linkedVehicleTransform.SetPositionAndRotation(Position, Rotation);
         }
 

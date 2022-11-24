@@ -18,6 +18,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         [SerializeField] GameObject SideFrontTemplate;
         [SerializeField] GameObject SideStraightTemplate;
         [SerializeField] GameObject SideWheelOpeningTemplate;
+        [SerializeField] GameObject CenterOfGravityIndicator;
         [SerializeField] PresetVehicleTypes initialVehicleType;
         [SerializeField] MeshBuilder CustomBodyMesh;
 
@@ -229,8 +230,6 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
             int numberOfMeshes = numberOfWheels + numberOfWheels - 2 + 1 + 3 + 3; //Wheel openings, between wheels, center, front, back
 
-            Debug.LogWarning($"Building mesh with {numberOfMeshes} meshes using {numberOfWheels} wheels");
-
             BodyMeshes = new GameObject[numberOfMeshes];
 
             int currentMeshCount = 0;
@@ -358,6 +357,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
             linkedController.LinkedRigidbody.mass = mass;
             linkedController.LinkedRigidbody.centerOfMass = centerOfMassPositionRelativeToCenterBottom;
+            CenterOfGravityIndicator.transform.localPosition = centerOfMassPositionRelativeToCenterBottom;
 
             DriverStaion.transform.localPosition = driverStationPositionRelativeToCenterBottom;
 

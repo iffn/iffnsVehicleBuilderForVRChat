@@ -111,9 +111,9 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                 linkedVehicleBuilder.length = currentFloat;
             }
 
-            if (float.TryParse(CenterOfMassZInputField.text, out x)
+            if (float.TryParse(CenterOfMassXInputField.text, out x)
                 && float.TryParse(CenterOfMassYInputField.text, out y)
-                && float.TryParse(CenterOfMassYInputField.text, out z))
+                && float.TryParse(CenterOfMassZInputField.text, out z))
 
             {
                 linkedVehicleBuilder.centerOfMassPositionRelativeToCenterBottom = new Vector3(x, y, z);
