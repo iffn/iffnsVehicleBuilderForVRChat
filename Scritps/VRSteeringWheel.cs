@@ -81,7 +81,6 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                 case VRC_Pickup.PickupHand.None:
                     Debug.LogWarning("Get hand angle of VRWheel could not be run because the pickup hand is None");
                     return 0;
-                    break;
                 case VRC_Pickup.PickupHand.Left:
                     handPosition = Networking.LocalPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position;
                     break;
@@ -91,7 +90,6 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                 default:
                     Debug.LogWarning("Get hand angle of VRWheel could not be run because the pickup hand is not defined: " + nameof(attachedPickup.currentHand));
                     return 0;
-                    break;
             }
 
             Vector3 localHandPosition = transform.parent.InverseTransformPoint(handPosition);

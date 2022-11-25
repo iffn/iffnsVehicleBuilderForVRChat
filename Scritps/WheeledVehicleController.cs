@@ -41,7 +41,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         float brakingInput = 1;
 
         public float wheelSyncAdjuster = 0.08f;
-        float assumedWheelRotation = 0;
+        //float assumedWheelRotation = 0;
 
         public float forwardVelocityDebug;
         public float turnRateDebug;
@@ -168,7 +168,9 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
             for (int i = 0; i < wheelColliders.Length; i++)
             {
+                #pragma warning disable IDE0059 // Unnecessary assignment of a value due to U# currently not understanding discard operator _
                 wheelColliders[i].GetWorldPose(out Vector3 pos, out Quaternion quat);
+                #pragma warning restore IDE0059 // Unnecessary assignment of a value
 
                 returnValue[i] = wheelColliders[i].transform.InverseTransformPoint(pos).y;
             }
@@ -229,7 +231,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
             if (Networking.LocalPlayer.IsUserInVR())
             {
-                applyVRControls();
+                ApplyVRControls();
             }
 
             if (Input.GetKeyDown(KeyCode.Return))
@@ -264,14 +266,13 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             LinkedSteeringWheelVisualizer.localRotation = Quaternion.Euler(0, 0, steeringInput * Mathf.Rad2Deg);
         }
 
-        void applyVRControls()
+        void ApplyVRControls()
         {
             //Check hand: Return if not held, otherwise get drive and brake inputs
             switch (LinkedVRSteeringWheelControlls.currentHand)
             {
                 case VRC_Pickup.PickupHand.None:
                     return;
-                    break;
                 case VRC_Pickup.PickupHand.Left:
                     driveInput = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger");
                     brakingInput = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger");
@@ -392,7 +393,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             float assumedSteeringInput = Mathf.Clamp(turnRate * Mathf.Rad2Deg * wheelSyncAdjuster * velocityDirection, -1, 1);
             //Debug.Log(numberOfWheels);
 
-            assumedWheelRotation += forwardVelocity / linkedVehicleBuilder.wheelRadius * Time.deltaTime;
+            //assumedWheelRotation += forwardVelocity / linkedVehicleBuilder.wheelRadius * Time.deltaTime;
 
             turnRateDebug = turnRate;
             forwardVelocityDebug = forwardVelocity;
