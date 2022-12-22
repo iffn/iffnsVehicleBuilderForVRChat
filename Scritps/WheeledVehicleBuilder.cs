@@ -20,7 +20,6 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         [SerializeField] GameObject SideWheelOpeningTemplate;
         [SerializeField] GameObject CenterOfGravityIndicator;
         [SerializeField] PresetVehicleTypes initialVehicleType;
-        [SerializeField] MeshBuilder CustomBodyMesh;
 
         //Runtime parameters
         WheelCollider[] wheelColliders = new WheelCollider[0];
@@ -51,32 +50,6 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         [UdonSynced(UdonSyncMode.None)] public float breakTorquePerWheel;
         [UdonSynced(UdonSyncMode.None)] public readonly bool[] drivenWheelPairs = new bool[maxWheels / 2];
         [UdonSynced(UdonSyncMode.None)] public readonly float[] steeringAngleDeg = new float[maxWheels / 2];
-
-        bool useCustomMesh = false;
-        public bool UseCustomMesh
-        {
-            set
-            {
-                foreach(GameObject body in BodyMeshes)
-                {
-                    if(body == null)
-                    {
-                        Debug.Log("Body mesh element null -> Wrong count calculation?");
-                        continue;
-                    }
-
-                    body.SetActive(!value);
-                }
-
-                CustomBodyMesh.gameObject.SetActive(value);
-
-                useCustomMesh = value;
-            }
-            get
-            {
-                return useCustomMesh;
-            }
-        }
 
         public void Setup(WheeledVehicleController linkedController)
         {
@@ -330,11 +303,6 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             else
             {
                 Debug.LogWarning($"Out of bounds 2 while building mesh with {numberOfMeshes} meshes using {numberOfWheels} wheels");
-            }
-            
-            foreach(GameObject bodyMesh in BodyMeshes)
-            {
-                bodyMesh.SetActive(!useCustomMesh);
             }
         }
 

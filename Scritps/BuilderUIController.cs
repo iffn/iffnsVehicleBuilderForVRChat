@@ -34,8 +34,6 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         [SerializeField] Button RespawnButton;
 
         [SerializeField] Toggle FixVehicleToggle;
-        [SerializeField] Toggle UseCustomMeshToggle;
-        [SerializeField] MeshBuilderInterface CustomMeshInterface;
 
         bool editInProgress = false;
 
@@ -52,13 +50,6 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         public void ToggleFixVehicle()
         {
             linkedVehicle.VehicleFixed = FixVehicleToggle.isOn;
-        }
-
-        public void ToggleUseCustomMesh()
-        {
-            CustomMeshInterface.gameObject.SetActive(UseCustomMeshToggle.isOn);
-
-            linkedVehicleBuilder.UseCustomMesh = UseCustomMeshToggle.isOn;
         }
 
         public void UpdateInputArrays()
@@ -226,7 +217,6 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
             ClaimOwnershipButton.gameObject.SetActive(!locallyOwned);
             RespawnButton.gameObject.SetActive(locallyOwned);
-            FixVehicleToggle.transform.parent.gameObject.SetActive(locallyOwned);
 
             CurrentOwnerName.text = owner.playerId + ": " + owner.displayName;
         }
@@ -242,8 +232,6 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             linkedVehicleBuilder = linkedVehicle.LinkedVehicleBuilder;
 
             SetVehicleOwnerDisplay(Networking.GetOwner(this.linkedVehicle.LinkedVehicleSync.gameObject));
-
-            ToggleUseCustomMesh();
         }
 
         void Start()
