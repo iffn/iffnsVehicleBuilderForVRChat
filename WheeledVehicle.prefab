@@ -59,7 +59,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 381c69598f2f9d3439e2e76830bc7aed, type: 2}
+  - {fileID: 2100000, guid: 84bd75fbd5f7576408eee667a281da62, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -413,7 +413,6 @@ MonoBehaviour:
     type: 3}
   CenterOfGravityIndicator: {fileID: 3715093484232272675}
   initialVehicleType: 1
-  CustomBodyMesh: {fileID: 0}
   mass: 0
   widthWithWheels: 0
   length: 0
