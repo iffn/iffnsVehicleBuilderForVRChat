@@ -22,7 +22,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             get
             {
                 return steeringAngle;
-            }
+            } 
         }
 
         public VRC_Pickup.PickupHand currentHand
@@ -39,6 +39,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             attachedCollider = transform.GetComponent<Collider>();
         }
 
+        /*
         public void SetSteeringWheelPositionRelativeToPlayer()
         {
             float playerHeight = (Networking.LocalPlayer.GetBonePosition(HumanBodyBones.Head) - Networking.LocalPlayer.GetPosition()).magnitude;
@@ -55,6 +56,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                 + transform.parent.forward * positionRelativeToHead.x
                 + transform.parent.up * positionRelativeToHead.y;
         }
+        */
 
         public void UpdateControlls()
         {

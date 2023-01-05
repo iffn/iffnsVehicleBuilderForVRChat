@@ -11,21 +11,21 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         WheeledVehicleController linkedVehicle;
         WheeledVehicleBuilder linkedVehicleBuilder;
 
+        //Vehicle
         [SerializeField] InputField MassInputField;
         [SerializeField] InputField widthWithWheelsInputField;
         [SerializeField] InputField lengthInputField;
-        [SerializeField] InputField CenterOfMassXInputField;
-        [SerializeField] InputField CenterOfMassYInputField;
-        [SerializeField] InputField CenterOfMassZInputField;
-        [SerializeField] InputField SteeringPositionXInputField;
-        [SerializeField] InputField SteeringPositionYInputField;
-        [SerializeField] InputField SteeringPositionZInputField;
+        [SerializeField] InputField[] CenterOfMassXYZInputFields;
+        [SerializeField] InputField NumberOfSeatRowsInputField;
+        [SerializeField] Toggle[] SeatsMirroredToggle;
 
+        //Wheels
         [SerializeField] InputField NumberOfWheelsInputField;
         [SerializeField] InputField WheelRadiusInputField;
+        [SerializeField] InputField WheelWidthInputField;
+        [SerializeField] Toggle[] DrivenWheelToggle;
         [SerializeField] InputField MotorTorqueInputField;
         [SerializeField] InputField BreakTorqueInputField;
-        [SerializeField] Toggle[] DrivenWheelInputField;
         [SerializeField] InputField[] SteeringAngleInputField;
 
         [SerializeField] Button ClaimOwnershipButton;
@@ -36,6 +36,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         [SerializeField] Toggle FixVehicleToggle;
 
         bool editInProgress = false;
+        bool skipUICalls = false;
 
         private void Update()
         {
@@ -58,13 +59,15 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             {
                 bool active = i < linkedVehicleBuilder.numberOfWheels / 2;
 
-                DrivenWheelInputField[i].gameObject.SetActive(active);
+                DrivenWheelToggle[i].gameObject.SetActive(active);
                 SteeringAngleInputField[i].gameObject.SetActive(active);
             }
         }
 
         public void UpdateVehicleFromUI()
         {
+            if (skipUICalls) return;
+
             if (editInProgress)
             {
                 Debug.LogWarning("Edit in progress");
@@ -102,28 +105,33 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                 linkedVehicleBuilder.length = currentFloat;
             }
 
-            if (float.TryParse(CenterOfMassXInputField.text, out x)
-                && float.TryParse(CenterOfMassYInputField.text, out y)
-                && float.TryParse(CenterOfMassZInputField.text, out z))
+            if (float.TryParse(CenterOfMassXYZInputFields[0].text, out x)
+                && float.TryParse(CenterOfMassXYZInputFields[1].text, out y)
+                && float.TryParse(CenterOfMassXYZInputFields[2].text, out z))
 
             {
                 linkedVehicleBuilder.centerOfMassPositionRelativeToCenterBottom = new Vector3(x, y, z);
             }
 
-            if (float.TryParse(SteeringPositionXInputField.text, out x)
-                && float.TryParse(SteeringPositionYInputField.text, out y)
-                && float.TryParse(SteeringPositionZInputField.text, out z))
+            if (int.TryParse(NumberOfSeatRowsInputField.text, out currentInt))
             {
-                linkedVehicleBuilder.driverStationPositionRelativeToCenterBottom = new Vector3(x, y, z);
+                currentInt = Mathf.Clamp(currentInt, 1, WheeledVehicleBuilder.maxSeatRows);
+
+                linkedVehicleBuilder.numberOfSeatRows = currentInt;
+            }
+
+            for (int i = 0; i < SeatsMirroredToggle.Length; i++)
+            {
+                linkedVehicleBuilder.seatsMirrored[i] = SeatsMirroredToggle[i].isOn;
             }
 
             //Wheels
             if (int.TryParse(NumberOfWheelsInputField.text, out currentInt))
             {
                 //currentInt = (currentInt % 2 != 0) ? currentInt -= 1 : currentInt;
+
                 currentInt = currentInt / 2 * 2; //Make even
-                currentInt = currentInt < WheeledVehicleBuilder.minWheels ? WheeledVehicleBuilder.minWheels : currentInt;
-                currentInt = currentInt > WheeledVehicleBuilder.maxWheels ? WheeledVehicleBuilder.maxWheels : currentInt;
+                currentInt = Mathf.Clamp(currentInt, WheeledVehicleBuilder.minWheels, WheeledVehicleBuilder.maxWheels);
 
                 NumberOfWheelsInputField.text = currentInt.ToString(); //Doesn't invoke delegates
 
@@ -133,6 +141,16 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             if (float.TryParse(WheelRadiusInputField.text, out currentFloat))
             {
                 linkedVehicleBuilder.wheelRadius = currentFloat;
+            }
+
+            if (float.TryParse(WheelWidthInputField.text, out currentFloat))
+            {
+                linkedVehicleBuilder.wheelWidth = currentFloat;
+            }
+
+            for (int i = 0; i < linkedVehicleBuilder.drivenWheelPairs.Length; i++)
+            {
+                linkedVehicleBuilder.drivenWheelPairs[i] = DrivenWheelToggle[i].isOn;
             }
 
             if (float.TryParse(MotorTorqueInputField.text, out currentFloat))
@@ -145,10 +163,8 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                 linkedVehicleBuilder.breakTorquePerWheel = currentFloat;
             }
 
-            for (int i = 0; i < linkedVehicleBuilder.numberOfWheels / 2; i++)
+            for (int i = 0; i < linkedVehicleBuilder.steeringAngleDeg.Length; i++)
             {
-                linkedVehicleBuilder.drivenWheelPairs[i] = DrivenWheelInputField[i].isOn;
-
                 if (float.TryParse(SteeringAngleInputField[i].text, out currentFloat))
                 {
                     linkedVehicleBuilder.steeringAngleDeg[i] = currentFloat;
@@ -157,58 +173,66 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
             linkedVehicleBuilder.BuildVehicleBasedOnBuildParameters();
 
+            ToggleArrayElementsDependingOnInputs();
+
             editInProgress = false;
         }
 
         public void UpdateUIFromVehicle()
         {
+            skipUICalls = true;
+
+            //Vehicle
             MassInputField.text = linkedVehicleBuilder.mass.ToString();
             widthWithWheelsInputField.text = linkedVehicleBuilder.widthWithWheels.ToString();
             lengthInputField.text = linkedVehicleBuilder.length.ToString();
-            CenterOfMassXInputField.text = linkedVehicleBuilder.centerOfMassPositionRelativeToCenterBottom.x.ToString();
-            CenterOfMassYInputField.text = linkedVehicleBuilder.centerOfMassPositionRelativeToCenterBottom.y.ToString();
-            CenterOfMassZInputField.text = linkedVehicleBuilder.centerOfMassPositionRelativeToCenterBottom.z.ToString();
-            SteeringPositionXInputField.text = linkedVehicleBuilder.driverStationPositionRelativeToCenterBottom.x.ToString();
-            SteeringPositionYInputField.text = linkedVehicleBuilder.driverStationPositionRelativeToCenterBottom.y.ToString();
-            SteeringPositionZInputField.text = linkedVehicleBuilder.driverStationPositionRelativeToCenterBottom.z.ToString();
+            CenterOfMassXYZInputFields[0].text = linkedVehicleBuilder.centerOfMassPositionRelativeToCenterBottom.x.ToString();
+            CenterOfMassXYZInputFields[1].text = linkedVehicleBuilder.centerOfMassPositionRelativeToCenterBottom.y.ToString();
+            CenterOfMassXYZInputFields[2].text = linkedVehicleBuilder.centerOfMassPositionRelativeToCenterBottom.z.ToString();
+            NumberOfSeatRowsInputField.text = linkedVehicleBuilder.numberOfSeatRows.ToString();
+            
+            for(int i = 0; i<WheeledVehicleBuilder.maxSeatRows; i++)
+            {
+                SeatsMirroredToggle[i].isOn = linkedVehicleBuilder.seatsMirrored[i];
+            }
 
+            //Wheels
             NumberOfWheelsInputField.text = linkedVehicleBuilder.numberOfWheels.ToString();
             WheelRadiusInputField.text = linkedVehicleBuilder.wheelRadius.ToString();
+            WheelWidthInputField.text = linkedVehicleBuilder.wheelWidth.ToString();
+
+            for (int i = 0; i < WheeledVehicleBuilder.maxWheels / 2; i++)
+            {
+                DrivenWheelToggle[i].isOn = linkedVehicleBuilder.drivenWheelPairs[i];
+            }
+
             MotorTorqueInputField.text = linkedVehicleBuilder.motorTorquePerDrivenWheel.ToString();
             BreakTorqueInputField.text = linkedVehicleBuilder.breakTorquePerWheel.ToString();
 
-
-            if (DrivenWheelInputField == null)
+            for (int i = 0; i < WheeledVehicleBuilder.maxWheels / 2; i++)
             {
-                Debug.LogWarning($"{nameof(DrivenWheelInputField)} not yet created");
-            }
-            else if (SteeringAngleInputField == null)
-            {
-                Debug.LogWarning($"{nameof(SteeringAngleInputField)} not yet created");
-            }
-            else if (linkedVehicleBuilder.drivenWheelPairs.Length != DrivenWheelInputField.Length)
-            {
-                Debug.LogWarning($"{nameof(linkedVehicleBuilder.drivenWheelPairs)} length not correct");
-                Debug.LogWarning($"   {nameof(linkedVehicleBuilder.drivenWheelPairs)} length = {linkedVehicleBuilder.drivenWheelPairs.Length}");
-                Debug.LogWarning($"   {nameof(DrivenWheelInputField)} length = {DrivenWheelInputField.Length}");
-            }
-            else if (linkedVehicleBuilder.steeringAngleDeg.Length != DrivenWheelInputField.Length)
-            {
-                Debug.LogWarning($"{nameof(linkedVehicleBuilder.steeringAngleDeg)} length 2 not correct");
-            }
-            else if (SteeringAngleInputField.Length != DrivenWheelInputField.Length)
-            {
-                Debug.LogWarning($"{nameof(SteeringAngleInputField)} length 2 not correct");
-            }
-            else
-            {
-                for (int i = 0; i < DrivenWheelInputField.Length; i++)
-                {
-                    //DrivenWheelInputField[i].isOn = LinkedVehicleBuilder.drivenWheelPairs[i];
-                    //SteeringAngleInputField[i].text = LinkedVehicleBuilder.steeringAngleDeg[i].ToString();
-                }
+                SteeringAngleInputField[i].text = linkedVehicleBuilder.steeringAngleDeg[i].ToString();
             }
 
+            ToggleArrayElementsDependingOnInputs();
+
+            skipUICalls = false;
+        }
+
+        void ToggleArrayElementsDependingOnInputs()
+        {
+            for(int i = 0; i<WheeledVehicleBuilder.maxSeatRows; i++)
+            {
+                SeatsMirroredToggle[i].gameObject.SetActive(i < linkedVehicleBuilder.numberOfSeatRows);
+            }
+
+            for (int i = 0; i < WheeledVehicleBuilder.maxWheels / 2; i++)
+            {
+                bool isActive = i < linkedVehicleBuilder.numberOfWheels;
+
+                DrivenWheelToggle[i].gameObject.SetActive(isActive);
+                SteeringAngleInputField[i].gameObject.SetActive(isActive);
+            }
         }
 
         public void SetVehicleOwnerDisplay(VRCPlayerApi owner)

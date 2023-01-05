@@ -1,0 +1,109 @@
+﻿
+using iffnsStuff.iffnsVRCStuff.WheeledVehicles;
+using UdonSharp;
+using UnityEngine;
+using VRC.SDKBase;
+using VRC.Udon;
+
+public class WheeledVehicleSeatController : SeatController
+{
+    [SerializeField] Transform wheel;
+
+    WheeledVehicleController linkedVehicle;
+    VRCStation linkedVRCStaion;
+
+    public void Setup(WheeledVehicleController linkedVehicle)
+    {
+        this.linkedVehicle = linkedVehicle;
+
+        linkedVRCStaion = transform.GetComponent<VRCStation>();
+        linkedVRCStaion.disableStationExit = true;
+    }
+
+    protected override void UpdateFunction()
+    {
+        base.UpdateFunction();
+
+        if (SeatedPlayer != null && SeatedPlayer.isLocal)
+        {
+            if (Input.GetKeyDown(KeyCode.Return))
+            {
+                linkedVRCStaion.ExitStation(Networking.LocalPlayer);
+            }
+        }
+    }
+
+    public void ScaleWheel(VRCPlayerApi player)
+    {
+        Vector3 leftShoulderPosition = player.GetBonePosition(HumanBodyBones.LeftShoulder);
+
+        Vector3 rightShoulderPosition = player.GetBonePosition(HumanBodyBones.RightShoulder);
+        Vector3 rightEllbowPosition = player.GetBonePosition(HumanBodyBones.RightLowerArm);
+        Vector3 rightHandPosition = player.GetBonePosition(HumanBodyBones.RightHand);
+        
+        Vector3 headPosition = player.GetBonePosition(HumanBodyBones.Head);
+
+        float shoulderDistance = (leftShoulderPosition - rightShoulderPosition).magnitude;
+
+        float lowerArmLength = (rightEllbowPosition - rightHandPosition).magnitude;
+        float upperArmLength = (rightShoulderPosition - rightEllbowPosition).magnitude;
+
+        float rightArmLength = lowerArmLength + upperArmLength;
+
+        float middleShoulderToHeadDistance = (0.5f * (rightShoulderPosition + leftShoulderPosition) - headPosition).magnitude;
+
+        if (shoulderDistance < minAvatarDistance || shoulderDistance > maxAvatarDistance | rightArmLength < minAvatarDistance || rightArmLength > maxAvatarDistance)
+        {
+            //Invalid avatar size
+            Debug.Log("Invalid player size detected. Scaling with assumption height");
+
+            float referenceSize;
+
+            Vector3 playerPosition = player.GetPosition();
+
+            if (player.isLocal)
+            {
+                headPosition = Networking.LocalPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position;
+                referenceSize = (headPosition - playerPosition).magnitude;
+            }
+            else
+            {
+                //Assumption: Head position not needed
+                referenceSize = 1.6f; //Eye to feet distance
+            }
+
+            lowerArmLength = referenceSize * 0.25f;
+            upperArmLength = referenceSize * 0.25f;
+            shoulderDistance = referenceSize * 0.25f;
+        }
+
+        Vector3 localWheelPosition = Vector3.zero;
+
+        localWheelPosition.z = targetHeadPosition.localPosition.x + lowerArmLength;
+        localWheelPosition.y = targetHeadPosition.localPosition.y - upperArmLength - middleShoulderToHeadDistance;
+
+        float wheelDiameter = shoulderDistance;
+
+        wheel.transform.localPosition = localWheelPosition;
+        wheel.transform.localScale = wheelDiameter * Vector3.one;
+    }
+
+    public override void OnStationEntered(VRCPlayerApi player)
+    {
+        base.OnStationEntered(player);
+
+        if (player.isLocal)
+        {
+            linkedVehicle.EnteredDriverSeat();
+        }
+
+        ScaleWheel(player);
+    }
+
+    public override void OnStationExited(VRCPlayerApi player)
+    {
+        base.OnStationExited(player);
+
+        linkedVehicle.ExitedDriverSeat();
+    }
+}

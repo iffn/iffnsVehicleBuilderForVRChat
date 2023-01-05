@@ -14,7 +14,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
     {
         //Unity assignments:
         [SerializeField] WheeledVehicleBuilder linkedVehicleBuilder;
-        [SerializeField] WheeledVehicleStation linkedDriverStation;
+        [SerializeField] WheeledVehicleSeatController linkedDriverStation;
         [SerializeField] WheeledVehicleSync linkedVehicleSync;
         [SerializeField] VRSteeringWheel LinkedVRSteeringWheelControlls;
         [SerializeField] Transform LinkedSteeringWheelVisualizer;
@@ -75,7 +75,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                 LinkedRigidbody.velocity = Vector3.zero;
                 LinkedRigidbody.angularVelocity = Vector3.zero;
 
-                linkedDriverStation.EnableCollider = !value;
+                LinkedVehicleBuilder.EnableStationEntry = !value;
 
                 vehicleFixed = value;
             }
@@ -128,8 +128,6 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             {
                 LinkedVRSteeringWheelControlls.gameObject.SetActive(true);
             }
-
-            LinkedVRSteeringWheelControlls.SetSteeringWheelPositionRelativeToPlayer();
         }
 
         public void ExitedDriverSeat()
@@ -349,7 +347,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             UpdateWheelMeshPositionWhenOwner();
 
             //Setup scripts
-            linkedDriverStation.Setup();
+            linkedDriverStation.Setup(this);
             linkedVehicleSync.Setup(linkedVehicle: this);
             linkedVehicleBuilder.Setup(linkedController: this);
             LinkedUI.Setup(linkedVehicle: this);

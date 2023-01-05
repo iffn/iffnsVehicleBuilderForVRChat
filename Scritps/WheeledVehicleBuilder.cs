@@ -9,8 +9,8 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
     public class WheeledVehicleBuilder : UdonSharpBehaviour
     {
         //Parameters to be set in Unity
-        [SerializeField] WheeledVehicleStation DriverStaion;
         [SerializeField] WheelCollider WheelPrefab;
+        [SerializeField] SeatController[] AvailableSeats;
 
         //Body mesh templates
         [SerializeField] GameObject CenterFrontTemplate;
@@ -30,8 +30,8 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
         public const int minWheels = 4;
         public const int maxWheels = 12;
-
-        float wheelWidth = 0.4f;
+        public const int maxSeatRows = 5;
+        public const int seatHeight = 1;
 
         //Bulid parameters:
         //-----------------
@@ -41,21 +41,38 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         [UdonSynced(UdonSyncMode.None)] public float widthWithWheels;
         [UdonSynced(UdonSyncMode.None)] public float length;
         [UdonSynced(UdonSyncMode.None)] public Vector3 centerOfMassPositionRelativeToCenterBottom;
-        [UdonSynced(UdonSyncMode.None)] public Vector3 driverStationPositionRelativeToCenterBottom;
+        [UdonSynced(UdonSyncMode.None)] public int numberOfSeatRows;
+        [UdonSynced(UdonSyncMode.None)] public bool[] seatsMirrored;
 
         //Wheels
         [UdonSynced(UdonSyncMode.None)] public int numberOfWheels; //Divisible by 2, min = 4
         [UdonSynced(UdonSyncMode.None)] public float wheelRadius;
+        [UdonSynced(UdonSyncMode.None)] public float wheelWidth;
+        [UdonSynced(UdonSyncMode.None)] public readonly bool[] drivenWheelPairs = new bool[maxWheels / 2];
         [UdonSynced(UdonSyncMode.None)] public float motorTorquePerDrivenWheel;
         [UdonSynced(UdonSyncMode.None)] public float breakTorquePerWheel;
-        [UdonSynced(UdonSyncMode.None)] public readonly bool[] drivenWheelPairs = new bool[maxWheels / 2];
         [UdonSynced(UdonSyncMode.None)] public readonly float[] steeringAngleDeg = new float[maxWheels / 2];
+
+
+        //Funcitons:
+        //----------
+
+        public bool EnableStationEntry
+        {
+            set
+            {
+                foreach(SeatController controller in AvailableSeats)
+                {
+                    controller.EnableStationEntry = value;
+                }
+            }
+        }
 
         public void Setup(WheeledVehicleController linkedController)
         {
             this.linkedController = linkedController;
 
-            DriverStaion.linkedVehicle = linkedController;
+            seatsMirrored = new bool[maxSeatRows];
         }
 
         public void MakeLocalPlayerOwner()
@@ -74,7 +91,13 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                     widthWithWheels = 2;
                     length = 3.2f;
                     centerOfMassPositionRelativeToCenterBottom = 0.5f * Vector3.up;
-                    driverStationPositionRelativeToCenterBottom = new Vector3(0, 0.5f, 1);
+                    numberOfSeatRows = 3;
+                    seatsMirrored[0] = false;
+
+                    for(int i = 1; i< seatsMirrored.Length; i++)
+                    {
+                        seatsMirrored[i] = true;
+                    }
 
                     numberOfWheels = 6;
                     wheelRadius = 0.5f;
@@ -94,7 +117,12 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                     widthWithWheels = 1.8f;
                     length = 3f;
                     centerOfMassPositionRelativeToCenterBottom = 0.5f * Vector3.up;
-                    driverStationPositionRelativeToCenterBottom = new Vector3(-0.3f, 0.5f, .6f);
+                    numberOfSeatRows = 2;
+                    
+                    for (int i = 0; i < seatsMirrored.Length; i++)
+                    {
+                        seatsMirrored[i] = true;
+                    }
 
                     numberOfWheels = 4;
                     wheelRadius = 0.4f;
@@ -111,7 +139,12 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                     widthWithWheels = 6.8f;
                     length = 8.6f;
                     centerOfMassPositionRelativeToCenterBottom = 0.5f * Vector3.up;
-                    driverStationPositionRelativeToCenterBottom = new Vector3(0, 2.5f, 3.5f);
+                    numberOfSeatRows = 1;
+                    
+                    for (int i = 0; i < seatsMirrored.Length; i++)
+                    {
+                        seatsMirrored[i] = true;
+                    }
 
                     numberOfWheels = 4;
                     wheelRadius = 1.5f;
@@ -327,7 +360,39 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             linkedController.LinkedRigidbody.centerOfMass = centerOfMassPositionRelativeToCenterBottom;
             CenterOfGravityIndicator.transform.localPosition = centerOfMassPositionRelativeToCenterBottom;
 
-            DriverStaion.transform.localPosition = driverStationPositionRelativeToCenterBottom;
+            //Seats
+            float seatXPos = widthWithWheels * 0.4f;
+            float seatZPosOffset = length * 0.8f / numberOfSeatRows;
+
+            for(int i = 0; i < maxSeatRows; i++)
+            {
+                int firstSeat = i * 2;
+                int secondSeat = firstSeat + 1;
+
+                if(i < numberOfSeatRows)
+                {
+                    float zPos = length * 0.4f - seatZPosOffset * i;
+
+                    AvailableSeats[firstSeat].gameObject.SetActive(true);
+
+                    if (seatsMirrored[i])
+                    {
+                        AvailableSeats[firstSeat].transform.localPosition = new Vector3(-seatXPos, seatHeight, zPos);
+                        AvailableSeats[secondSeat].transform.localPosition = new Vector3(seatXPos, seatHeight, zPos);
+                        AvailableSeats[secondSeat].gameObject.SetActive(true);
+                    }
+                    else
+                    {
+                        AvailableSeats[firstSeat].transform.localPosition = new Vector3(0, seatHeight, zPos);
+                        AvailableSeats[secondSeat].gameObject.SetActive(false);
+                    }
+                }
+                else
+                {
+                    AvailableSeats[firstSeat].gameObject.SetActive(false);
+                    AvailableSeats[secondSeat].gameObject.SetActive(false);
+                }
+            }
 
             //Wheels:
             //-------
