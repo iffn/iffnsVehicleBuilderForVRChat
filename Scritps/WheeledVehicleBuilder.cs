@@ -19,6 +19,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         [SerializeField] GameObject SideStraightTemplate;
         [SerializeField] GameObject SideWheelOpeningTemplate;
         [SerializeField] GameObject CenterOfGravityIndicator;
+        [SerializeField] Transform BodyHolder;
         [SerializeField] PresetVehicleTypes initialVehicleType;
 
         //Runtime parameters
@@ -31,7 +32,6 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         public const int minWheels = 4;
         public const int maxWheels = 12;
         public const int maxSeatRows = 5;
-        public const int seatHeight = 1;
 
         //Bulid parameters:
         //-----------------
@@ -40,6 +40,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         [UdonSynced(UdonSyncMode.None)] public float mass;
         [UdonSynced(UdonSyncMode.None)] public float widthWithWheels;
         [UdonSynced(UdonSyncMode.None)] public float length;
+        [UdonSynced(UdonSyncMode.None)] public float groundClearance;
         [UdonSynced(UdonSyncMode.None)] public Vector3 centerOfMassPositionRelativeToCenterBottom;
         [UdonSynced(UdonSyncMode.None)] public int numberOfSeatRows;
         [UdonSynced(UdonSyncMode.None)] public bool[] seatsMirrored;
@@ -90,6 +91,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
                     widthWithWheels = 2;
                     length = 3.2f;
+                    groundClearance = 0.4f;
                     centerOfMassPositionRelativeToCenterBottom = 0.5f * Vector3.up;
                     numberOfSeatRows = 3;
                     seatsMirrored[0] = false;
@@ -101,6 +103,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
                     numberOfWheels = 6;
                     wheelRadius = 0.5f;
+                    wheelWidth = 0.4f;
                     motorTorquePerDrivenWheel = 200;
                     breakTorquePerWheel = 500;
 
@@ -116,6 +119,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                 case PresetVehicleTypes.Car:
                     widthWithWheels = 1.8f;
                     length = 3f;
+                    groundClearance = 0.3f;
                     centerOfMassPositionRelativeToCenterBottom = 0.5f * Vector3.up;
                     numberOfSeatRows = 2;
                     
@@ -126,6 +130,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
                     numberOfWheels = 4;
                     wheelRadius = 0.4f;
+                    wheelWidth = 0.3f;
                     motorTorquePerDrivenWheel = 400;
                     breakTorquePerWheel = 500;
 
@@ -138,6 +143,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                 case PresetVehicleTypes.Monstertruck:
                     widthWithWheels = 6.8f;
                     length = 8.6f;
+                    groundClearance = 1.2f;
                     centerOfMassPositionRelativeToCenterBottom = 0.5f * Vector3.up;
                     numberOfSeatRows = 1;
                     
@@ -148,6 +154,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
                     numberOfWheels = 4;
                     wheelRadius = 1.5f;
+                    wheelWidth = 0.6f;
                     motorTorquePerDrivenWheel = 1500;
                     breakTorquePerWheel = 3000;
 
@@ -228,6 +235,14 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         
         void BuildBody()
         {
+            BodyHolder.localPosition = groundClearance * Vector3.up;
+
+            float yScale = 2 - groundClearance / wheelRadius;
+
+            yScale = Mathf.Clamp(yScale, 0.1f, 10);
+
+            BodyHolder.localScale = new Vector3(1, yScale, 1); // Shortened from (2*r - d)/r 
+
             //Cleanup body
             for (int i = 0; i < BodyMeshes.Length; i++)
             {
@@ -247,43 +262,43 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             //Wheel openings:
             for (int i = 0; i < numberOfWheels; i++)
             {
-                GameObject wheelOpening = Instantiate(SideWheelOpeningTemplate, transform);
+                GameObject wheelOpening = Instantiate(SideWheelOpeningTemplate, BodyHolder);
 
                 BodyMeshes[currentMeshCount++] = wheelOpening;
 
                 float sideMultiplicator = 1 - 2 * (i % 2); //1 if even, -1 if uneven
 
-                wheelOpening.transform.localScale = new Vector3(sideMultiplicator, wheelRadius * 2, wheelRadius * 2);
+                wheelOpening.transform.localScale = new Vector3(sideMultiplicator * wheelWidth, wheelRadius * 2, wheelRadius * 2);
 
                 int symetricArrayIndex = i / 2;
 
                 float forwardPosition = symetricArrayIndex * distanceBetweenWheels - firstWheelPosition;
 
-                wheelOpening.transform.localPosition = new Vector3((widthWithWheels * 0.5f - wheelWidth) * sideMultiplicator, wheelRadius, forwardPosition);
+                wheelOpening.transform.localPosition = new Vector3((widthWithWheels * 0.5f - wheelWidth) * sideMultiplicator, 0, forwardPosition);
             }
 
             //Between wheels:
             for (int i = 0; i < numberOfWheels - 2; i++)
             {
-                GameObject sideStraight = Instantiate(SideStraightTemplate, transform);
+                GameObject sideStraight = Instantiate(SideStraightTemplate, BodyHolder);
 
                 BodyMeshes[currentMeshCount++] = sideStraight;
 
                 float sideMultiplicator = 1 - 2 * (i % 2);
 
-                sideStraight.transform.localScale = new Vector3(sideMultiplicator, betweenDistance, wheelRadius * 2);
+                sideStraight.transform.localScale = new Vector3(sideMultiplicator * wheelWidth, betweenDistance, wheelRadius * 2);
 
                 int symetricArrayIndex = i / 2;
 
                 float forwardPosition = symetricArrayIndex * distanceBetweenWheels - firstWheelPosition + wheelRadius;
 
-                sideStraight.transform.localPosition = new Vector3((widthWithWheels * 0.5f - wheelWidth) * sideMultiplicator, wheelRadius, forwardPosition);
+                sideStraight.transform.localPosition = new Vector3((widthWithWheels * 0.5f - wheelWidth) * sideMultiplicator, 0, forwardPosition);
             }
 
             //Floor:
-            GameObject floor = Instantiate(CenterMiddleTemplate, transform);
+            GameObject floor = Instantiate(CenterMiddleTemplate, BodyHolder);
             BodyMeshes[currentMeshCount++] = floor;
-            floor.transform.localPosition = new Vector3(0, wheelRadius, 0);
+            floor.transform.localPosition = Vector3.zero;
             floor.transform.localScale = new Vector3(widthWithWheels * 0.5f - wheelWidth, length, wheelRadius * 2);
 
             /*
@@ -293,33 +308,33 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             */
 
             //Front and back middle:
-            GameObject frontMiddle = Instantiate(CenterFrontTemplate, transform);
+            GameObject frontMiddle = Instantiate(CenterFrontTemplate, BodyHolder);
             BodyMeshes[currentMeshCount++] = frontMiddle;
-            frontMiddle.transform.localPosition = new Vector3(0, wheelRadius, length * 0.5f);
+            frontMiddle.transform.localPosition = new Vector3(0, 0, length * 0.5f);
             frontMiddle.transform.localScale = new Vector3(widthWithWheels * 0.5f - wheelWidth, frontMiddle.transform.localScale.y, wheelRadius * 2);
 
-            GameObject backMiddle = Instantiate(frontMiddle, transform);
+            GameObject backMiddle = Instantiate(frontMiddle, BodyHolder);
             BodyMeshes[currentMeshCount++] = backMiddle;
-            frontMiddle.transform.localPosition = new Vector3(0, wheelRadius, -length * 0.5f);
+            frontMiddle.transform.localPosition = new Vector3(0, 0, -length * 0.5f);
             backMiddle.transform.localScale = new Vector3(backMiddle.transform.localScale.x, -backMiddle.transform.localScale.y, backMiddle.transform.localScale.z);
 
-            GameObject backRight = Instantiate(SideFrontTemplate, transform);
+            GameObject backRight = Instantiate(SideFrontTemplate, BodyHolder);
             BodyMeshes[currentMeshCount++] = backRight;
-            backRight.transform.localPosition = new Vector3(widthWithWheels * 0.5f - wheelWidth, wheelRadius, -length * 0.5f);
-            backRight.transform.localScale = new Vector3(1, backRight.transform.localScale.y, wheelRadius * 2);
+            backRight.transform.localPosition = new Vector3(widthWithWheels * 0.5f - wheelWidth, 0, -length * 0.5f);
+            backRight.transform.localScale = new Vector3(wheelWidth, backRight.transform.localScale.y, wheelRadius * 2);
 
-            GameObject backLeft = Instantiate(backRight, transform);
+            GameObject backLeft = Instantiate(backRight, BodyHolder);
             BodyMeshes[currentMeshCount++] = backLeft;
             backLeft.transform.localPosition = new Vector3(-backRight.transform.localPosition.x, backRight.transform.localPosition.y, backRight.transform.localPosition.z);
-            backLeft.transform.localScale = new Vector3(-backRight.transform.localScale.x, backRight.transform.localScale.y, backRight.transform.localScale.z);
+            backLeft.transform.localScale = new Vector3(-wheelWidth, backRight.transform.localScale.y, backRight.transform.localScale.z);
 
             if(currentMeshCount <= numberOfMeshes)
             {
-                GameObject frontRight = Instantiate(backRight, transform);
+                GameObject frontRight = Instantiate(backRight, BodyHolder);
 
                 BodyMeshes[currentMeshCount++] = frontRight;
                 frontRight.transform.localPosition = new Vector3(backRight.transform.localPosition.x, backRight.transform.localPosition.y, -backRight.transform.localPosition.z);
-                frontRight.transform.localScale = new Vector3(backRight.transform.localScale.x, -backRight.transform.localScale.y, backRight.transform.localScale.z);
+                frontRight.transform.localScale = new Vector3(wheelWidth, -backRight.transform.localScale.y, backRight.transform.localScale.z);
             }
             else
             {
@@ -328,10 +343,10 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
             if (currentMeshCount <= numberOfMeshes)
             {
-                GameObject frontLeft = Instantiate(backLeft, transform);
+                GameObject frontLeft = Instantiate(backLeft, BodyHolder);
                 BodyMeshes[currentMeshCount++] = frontLeft;
                 frontLeft.transform.localPosition = new Vector3(backLeft.transform.localPosition.x, backLeft.transform.localPosition.y, -backLeft.transform.localPosition.z);
-                frontLeft.transform.localScale = new Vector3(backLeft.transform.localScale.x, -backLeft.transform.localScale.y, backLeft.transform.localScale.z);
+                frontLeft.transform.localScale = new Vector3(-wheelWidth, -backLeft.transform.localScale.y, backLeft.transform.localScale.z);
             }
             else
             {
@@ -361,8 +376,9 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             CenterOfGravityIndicator.transform.localPosition = centerOfMassPositionRelativeToCenterBottom;
 
             //Seats
-            float seatXPos = widthWithWheels * 0.4f;
-            float seatZPosOffset = length * 0.8f / numberOfSeatRows;
+            float seatXPos = 0.3f;
+            float seatZPosOffset = length * 0.5f / (numberOfSeatRows - 1);
+            float seatHeight = wheelRadius + 0.1f; //+0.1 because of body thickness
 
             for(int i = 0; i < maxSeatRows; i++)
             {
@@ -371,7 +387,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
                 if(i < numberOfSeatRows)
                 {
-                    float zPos = length * 0.4f - seatZPosOffset * i;
+                    float zPos = length * 0.25f - seatZPosOffset * i;
 
                     AvailableSeats[firstSeat].gameObject.SetActive(true);
 
@@ -453,9 +469,9 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
                 float forwardPosition = symetricArrayIndex * distanceBetweenWheels - firstWheelPosition;
 
-                wheelMeshes[i].localScale = new Vector3(wheelMeshes[i].localScale.x, wheelRadius * 2, wheelRadius * 2);
+                wheelMeshes[i].localScale = new Vector3(wheelWidth, wheelRadius * 2, wheelRadius * 2);
 
-                wheelColliders[i].transform.localPosition = new Vector3(widthWithWheels * 0.5f * sideMultiplicator, wheelRadius, forwardPosition);
+                wheelColliders[i].transform.localPosition = new Vector3((widthWithWheels * 0.5f - wheelWidth * 0.5f) * sideMultiplicator, wheelRadius, forwardPosition);
 
                 wheelColliders[i].enabled = true;
             }

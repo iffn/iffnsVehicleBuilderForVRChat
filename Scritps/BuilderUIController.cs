@@ -15,6 +15,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         [SerializeField] InputField MassInputField;
         [SerializeField] InputField widthWithWheelsInputField;
         [SerializeField] InputField lengthInputField;
+        [SerializeField] InputField groundClearanceInputField;
         [SerializeField] InputField[] CenterOfMassXYZInputFields;
         [SerializeField] InputField NumberOfSeatRowsInputField;
         [SerializeField] Toggle[] SeatsMirroredToggle;
@@ -105,6 +106,11 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                 linkedVehicleBuilder.length = currentFloat;
             }
 
+            if (float.TryParse(groundClearanceInputField.text, out currentFloat))
+            {
+                linkedVehicleBuilder.groundClearance = currentFloat;
+            }
+
             if (float.TryParse(CenterOfMassXYZInputFields[0].text, out x)
                 && float.TryParse(CenterOfMassXYZInputFields[1].text, out y)
                 && float.TryParse(CenterOfMassXYZInputFields[2].text, out z))
@@ -186,6 +192,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             MassInputField.text = linkedVehicleBuilder.mass.ToString();
             widthWithWheelsInputField.text = linkedVehicleBuilder.widthWithWheels.ToString();
             lengthInputField.text = linkedVehicleBuilder.length.ToString();
+            groundClearanceInputField.text = linkedVehicleBuilder.groundClearance.ToString();
             CenterOfMassXYZInputFields[0].text = linkedVehicleBuilder.centerOfMassPositionRelativeToCenterBottom.x.ToString();
             CenterOfMassXYZInputFields[1].text = linkedVehicleBuilder.centerOfMassPositionRelativeToCenterBottom.y.ToString();
             CenterOfMassXYZInputFields[2].text = linkedVehicleBuilder.centerOfMassPositionRelativeToCenterBottom.z.ToString();
