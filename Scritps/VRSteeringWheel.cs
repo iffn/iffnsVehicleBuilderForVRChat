@@ -13,15 +13,18 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         VRCPickup attachedPickup;
         float initialAngle;
         float steeringAngle;
+        float maxSteeringAngleRad;
 
         Collider attachedCollider;
 
+        Vector3 initialLocalPosition;
+        Quaternion initialLocalRotation;
 
-        public float SteeringAngle
+        public float SteeringInput
         {
             get
             {
-                return steeringAngle;
+                return Mathf.Clamp(steeringAngle / maxSteeringAngleRad, -1, 1);
             } 
         }
 
@@ -33,10 +36,14 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             }
         }
 
-        public void Setup()
+        public void Setup(float maxSteeringAngleDeg)
         {
             attachedPickup = transform.GetComponent<VRCPickup>();
             attachedCollider = transform.GetComponent<Collider>();
+            this.maxSteeringAngleRad = maxSteeringAngleDeg * Mathf.Deg2Rad;
+
+            initialLocalPosition = transform.localPosition;
+            initialLocalRotation = transform.localRotation;
         }
 
         /*
@@ -65,16 +72,16 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                 return;
             }
 
-            steeringAngle = getHandAngle() - initialAngle;
+            steeringAngle = GetHandAngle() - initialAngle;
         }
 
         public void ResetWheelPosition()
         {
-            transform.localPosition = Vector3.zero;
-            transform.localRotation = Quaternion.identity;
+            transform.localPosition = initialLocalPosition;
+            transform.localRotation = initialLocalRotation;
         }
 
-        float getHandAngle()
+        float GetHandAngle()
         {
             Vector3 handPosition;
 
@@ -108,7 +115,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
         public override void OnPickup()
         {
-            initialAngle = getHandAngle();
+            initialAngle = GetHandAngle();
             attachedCollider.enabled = false;
         }
 
@@ -116,6 +123,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         {
             attachedCollider.enabled = true;
             steeringAngle = 0;
+            initialAngle = 0;
             ResetWheelPosition();
         }
     }

@@ -385,11 +385,12 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 1480375598502729158}
+  maxSteeringAnlgeDeg: 45
   linkedVehicleBuilder: {fileID: 1480375597205017746}
   linkedDriverStation: {fileID: 8846877710659823402}
   linkedVehicleSync: {fileID: 3852914982723976321}
-  LinkedVRSteeringWheelControlls: {fileID: 2168633874943968433}
-  LinkedSteeringWheelVisualizer: {fileID: 2628306666213173643}
+  LinkedVRSteeringWheel: {fileID: 2168633874943968433}
+  LinkedSteeringWheelVisualizer: {fileID: 465745373313047484}
   LinkedUI: {fileID: 0}
   wheelSyncAdjuster: 0.08
   forwardVelocityDebug: 0
@@ -784,7 +785,7 @@ CapsuleCollider:
   m_GameObject: {fileID: 8906869122797355196}
   m_Material: {fileID: 0}
   m_IsTrigger: 1
-  m_Enabled: 1
+  m_Enabled: 0
   m_Radius: 0.5000001
   m_Height: 2
   m_Direction: 1
@@ -1085,9 +1086,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 828ea71eba8ebbb46b10a643874b64f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!4 &2628306666213173643 stripped
+--- !u!4 &465745373313047484 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: 1451264847466695755, guid: a26d2002d1a74e94dbdb38095f98568e,
+  m_CorrespondingSourceObject: {fileID: 3903736591754329724, guid: a26d2002d1a74e94dbdb38095f98568e,
     type: 3}
   m_PrefabInstance: {fileID: 3484224033525786048}
   m_PrefabAsset: {fileID: 0}

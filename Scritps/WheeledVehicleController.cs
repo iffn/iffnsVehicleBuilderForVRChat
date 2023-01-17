@@ -13,10 +13,14 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
     public class WheeledVehicleController : UdonSharpBehaviour
     {
         //Unity assignments:
+        [Header("Settings")]
+        [SerializeField] float maxSteeringAnlgeDeg = 45;
+
+        [Header("Unity assingments")]
         [SerializeField] WheeledVehicleBuilder linkedVehicleBuilder;
         [SerializeField] WheeledVehicleSeatController linkedDriverStation;
         [SerializeField] WheeledVehicleSync linkedVehicleSync;
-        [SerializeField] VRSteeringWheel LinkedVRSteeringWheelControlls;
+        [SerializeField] VRSteeringWheel LinkedVRSteeringWheel;
         [SerializeField] Transform LinkedSteeringWheelVisualizer;
 
         public BuilderUIController LinkedUI; //For updating vehicle during sync;
@@ -126,7 +130,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
             if (Networking.LocalPlayer.IsUserInVR())
             {
-                LinkedVRSteeringWheelControlls.gameObject.SetActive(true);
+                LinkedVRSteeringWheel.gameObject.SetActive(true);
             }
         }
 
@@ -136,9 +140,9 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
             if (Networking.LocalPlayer.IsUserInVR())
             {
-                LinkedVRSteeringWheelControlls.gameObject.SetActive(false);
+                LinkedVRSteeringWheel.gameObject.SetActive(false);
 
-                LinkedVRSteeringWheelControlls.DropIfHeld();
+                LinkedVRSteeringWheel.DropIfHeld();
             }
         }
 
@@ -232,11 +236,12 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                 ApplyVRControls();
             }
 
+            steeringInput = LinkedVRSteeringWheel.SteeringInput;
+
             if (Input.GetKeyDown(KeyCode.Return))
             {
                 LinkedRigidbody.constraints = RigidbodyConstraints.None;
             }
-
 
             if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
             {
@@ -261,13 +266,15 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                 brakingInput = 1;
             }
 
-            LinkedSteeringWheelVisualizer.localRotation = Quaternion.Euler(0, 0, steeringInput * Mathf.Rad2Deg);
+            LinkedSteeringWheelVisualizer.localRotation = Quaternion.Euler(0, 0, steeringInput * maxSteeringAnlgeDeg);
         }
 
         void ApplyVRControls()
         {
+            LinkedVRSteeringWheel.UpdateControlls();
+
             //Check hand: Return if not held, otherwise get drive and brake inputs
-            switch (LinkedVRSteeringWheelControlls.currentHand)
+            switch (LinkedVRSteeringWheel.currentHand)
             {
                 case VRC_Pickup.PickupHand.None:
                     return;
@@ -298,9 +305,6 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                 default:
                     break;
             }
-
-            LinkedVRSteeringWheelControlls.UpdateControlls();
-            steeringInput = LinkedVRSteeringWheelControlls.SteeringAngle;
         }
 
 
@@ -334,12 +338,6 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             }
 
             //Setup
-            LinkedVRSteeringWheelControlls.gameObject.SetActive(Networking.LocalPlayer.IsUserInVR());
-
-            if (Networking.LocalPlayer.IsUserInVR())
-            {
-                LinkedVRSteeringWheelControlls.Setup();
-            }
 
             LinkedRigidbody = transform.GetComponent<Rigidbody>();
 
@@ -351,6 +349,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             linkedVehicleSync.Setup(linkedVehicle: this);
             linkedVehicleBuilder.Setup(linkedController: this);
             LinkedUI.Setup(linkedVehicle: this);
+            LinkedVRSteeringWheel.Setup(maxSteeringAnlgeDeg);
 
             //Setup builder
 

@@ -144,9 +144,9 @@ public class SeatController : UdonSharpBehaviour
     {
         seatedPlayer = player;
 
-        PositionStation(player);
-
         if (!player.isLocal) return;
+
+        PositionStation(player);
 
         entryTime = Time.time;
 
