@@ -4,188 +4,190 @@ using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
 
-
-
-[RequireComponent(typeof(VRCStation))]
-public class SeatController : UdonSharpBehaviour
+namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 {
-    [SerializeField] protected PlayerTrackingTypes playerTrackingType;
-    [SerializeField] protected Transform targetHeadPosition;
-    [SerializeField] protected Transform targetHipPosition;
-    [SerializeField] Transform playerMover;
-    [SerializeField] float positioningTime = 2;
-
-    float entryTime = Mathf.NegativeInfinity;
-
-    protected const float minAvatarDistance = 0.1f;
-    protected const float maxAvatarDistance = 5f;
-    Collider attacheCollider;
-
-    VRCStation attachedStation;
-
-    VRCPlayerApi seatedPlayer;
-    public VRCPlayerApi SeatedPlayer
+    [RequireComponent(typeof(VRCStation))]
+    public class SeatController : UdonSharpBehaviour
     {
-        get
-        {
-            return seatedPlayer;
-        }
-    }
+        [SerializeField] protected PlayerTrackingTypes playerTrackingType;
+        [SerializeField] protected Transform targetHeadPosition;
+        [SerializeField] protected Transform targetHipPosition;
+        [SerializeField] Transform playerMover;
+        [SerializeField] float positioningTime = 2;
 
-    public bool EnableStationEntry
-    {
-        set
-        {
-            transform.GetComponent<Collider>().enabled = value;
-        }
-    }
+        float entryTime = Mathf.NegativeInfinity;
 
-    public StationOccupantTypes StationOccupant
-    {
-        get
+        protected const float minAvatarDistance = 0.1f;
+        protected const float maxAvatarDistance = 5f;
+        Collider attacheCollider;
+
+        VRCStation attachedStation;
+
+        VRCPlayerApi seatedPlayer;
+        public VRCPlayerApi SeatedPlayer
         {
-            if (seatedPlayer == null)
+            get
             {
-                return StationOccupantTypes.noone;
-            }
-            else if (seatedPlayer.isLocal)
-            {
-                return StationOccupantTypes.me;
-            }
-            else
-            {
-                return StationOccupantTypes.someoneElse;
+                return seatedPlayer;
             }
         }
-    }
 
-    //Unity functions
-    void Start()
-    {
-        attacheCollider = transform.GetComponent<Collider>();
-        attachedStation = transform.GetComponent<VRCStation>();
-    }
-
-    private void Update()
-    {
-        UpdateFunction();
-    }
-
-    virtual protected void UpdateFunction() //Use separate update function for overriding
-    {
-        if (entryTime + positioningTime > Time.time)
+        public bool EnableStationEntry
         {
-            PositionStation(Networking.LocalPlayer);
+            set
+            {
+                transform.GetComponent<Collider>().enabled = value;
+            }
         }
-    }
 
-
-    //Custom functions
-    public void ForceEnter()
-    {
-        Networking.LocalPlayer.UseAttachedStation();
-    }
-
-    public void ForceExit()
-    {
-        if (seatedPlayer == null || !seatedPlayer.isLocal) return;
-
-        attachedStation.ExitStation(Networking.LocalPlayer);
-    }
-
-    void PositionStation(VRCPlayerApi player)
-    {
-        Vector3 trackingPosition;
-        Vector3 headTrackingPosition = Networking.LocalPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position;
-        Vector3 playerPosition = Networking.LocalPlayer.GetPosition();
-
-
-        float checkDistance;
-
-        Vector3 targetPosition;
-
-        switch (playerTrackingType)
+        public StationOccupantTypes StationOccupant
         {
-            case PlayerTrackingTypes.Feet:
-                //No need to move
-                return;
-            case PlayerTrackingTypes.Hip:
-                trackingPosition = Networking.LocalPlayer.GetBonePosition(HumanBodyBones.Hips);
-                
-                checkDistance = (trackingPosition - playerPosition).magnitude;
-                if(checkDistance < minAvatarDistance || checkDistance > maxAvatarDistance)
+            get
+            {
+                if (seatedPlayer == null)
                 {
-                    trackingPosition = 0.5f * (headTrackingPosition + playerPosition);
+                    return StationOccupantTypes.noone;
                 }
-
-                targetPosition = targetHipPosition.position;
-
-                break;
-            case PlayerTrackingTypes.Head:
-                trackingPosition = Networking.LocalPlayer.GetBonePosition(HumanBodyBones.Head);
-                
-                checkDistance = (trackingPosition - playerPosition).magnitude;
-                if (checkDistance < minAvatarDistance || checkDistance > maxAvatarDistance)
+                else if (seatedPlayer.isLocal)
                 {
-                    trackingPosition = headTrackingPosition;
+                    return StationOccupantTypes.me;
                 }
-
-                targetPosition = targetHeadPosition.position;
-
-                break;
-            default:
-                Debug.LogWarning($" Enum state {playerTrackingType} of Enum {nameof(PlayerTrackingTypes)} not defined in function {nameof(PositionStation)}");
-                return;
+                else
+                {
+                    return StationOccupantTypes.someoneElse;
+                }
+            }
         }
 
-        Vector3 offset = transform.InverseTransformVector(targetPosition - trackingPosition);
+        //Unity functions
+        void Start()
+        {
+            attacheCollider = transform.GetComponent<Collider>();
+            attachedStation = transform.GetComponent<VRCStation>();
+        }
 
-        offset.x = 0;
+        private void Update()
+        {
+            UpdateFunction();
+        }
 
-        playerMover.transform.localPosition += offset;
+        virtual protected void UpdateFunction() //Use separate update function for overriding
+        {
+            if (entryTime + positioningTime > Time.time)
+            {
+                PositionStation(Networking.LocalPlayer);
+            }
+        }
+
+
+        //Custom functions
+        public void ForceEnter()
+        {
+            Networking.LocalPlayer.UseAttachedStation();
+        }
+
+        public void ForceExit()
+        {
+            if (seatedPlayer == null || !seatedPlayer.isLocal) return;
+
+            attachedStation.ExitStation(Networking.LocalPlayer);
+        }
+
+        void PositionStation(VRCPlayerApi player)
+        {
+            Vector3 trackingPosition;
+            Vector3 headTrackingPosition = Networking.LocalPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position;
+            Vector3 playerPosition = Networking.LocalPlayer.GetPosition();
+
+
+            float checkDistance;
+
+            Vector3 targetPosition;
+
+            switch (playerTrackingType)
+            {
+                case PlayerTrackingTypes.Feet:
+                    //No need to move
+                    return;
+                case PlayerTrackingTypes.Hip:
+                    trackingPosition = Networking.LocalPlayer.GetBonePosition(HumanBodyBones.Hips);
+
+                    checkDistance = (trackingPosition - playerPosition).magnitude;
+                    if (checkDistance < minAvatarDistance || checkDistance > maxAvatarDistance)
+                    {
+                        trackingPosition = 0.5f * (headTrackingPosition + playerPosition);
+                    }
+
+                    targetPosition = targetHipPosition.position;
+
+                    break;
+                case PlayerTrackingTypes.Head:
+                    trackingPosition = Networking.LocalPlayer.GetBonePosition(HumanBodyBones.Head);
+
+                    checkDistance = (trackingPosition - playerPosition).magnitude;
+                    if (checkDistance < minAvatarDistance || checkDistance > maxAvatarDistance)
+                    {
+                        trackingPosition = headTrackingPosition;
+                    }
+
+                    targetPosition = targetHeadPosition.position;
+
+                    break;
+                default:
+                    Debug.LogWarning($" Enum state {playerTrackingType} of Enum {nameof(PlayerTrackingTypes)} not defined in function {nameof(PositionStation)}");
+                    return;
+            }
+
+            Vector3 offset = transform.InverseTransformVector(targetPosition - trackingPosition);
+
+            offset.x = 0;
+
+            playerMover.transform.localPosition += offset;
+        }
+
+        //VRChat functions:
+        public override void Interact()
+        {
+            Networking.LocalPlayer.UseAttachedStation();
+        }
+
+        public override void OnStationEntered(VRCPlayerApi player)
+        {
+            seatedPlayer = player;
+            attacheCollider.enabled = false;
+
+            if (!player.isLocal) return;
+
+            PositionStation(player);
+
+            entryTime = Time.time;
+
+        }
+
+        public override void OnStationExited(VRCPlayerApi player)
+        {
+            if (!player.isLocal) return;
+            attacheCollider.enabled = true;
+
+            playerMover.localPosition = Vector3.zero;
+
+            entryTime = Mathf.NegativeInfinity;
+
+        }
     }
 
-    //VRChat functions:
-    public override void Interact()
+    public enum PlayerTrackingTypes
     {
-        Networking.LocalPlayer.UseAttachedStation();
+        Feet,
+        Hip,
+        Head
     }
 
-    public override void OnStationEntered(VRCPlayerApi player)
+    public enum StationOccupantTypes
     {
-        seatedPlayer = player;
-        attacheCollider.enabled = false;
-
-        if (!player.isLocal) return;
-
-        PositionStation(player);
-
-        entryTime = Time.time;
-
-    }
-
-    public override void OnStationExited(VRCPlayerApi player)
-    {
-        if (!player.isLocal) return;
-        attacheCollider.enabled = true;
-
-        playerMover.localPosition = Vector3.zero;
-
-        entryTime = Mathf.NegativeInfinity;
-
+        noone,
+        me,
+        someoneElse
     }
 }
 
-public enum PlayerTrackingTypes
-{
-    Feet,
-    Hip,
-    Head
-}
-
-public enum StationOccupantTypes
-{
-    noone,
-    me,
-    someoneElse
-}

@@ -12,7 +12,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
     [UdonBehaviourSyncMode(BehaviourSyncMode.Continuous)]
     public class WheeledVehicleController : UdonSharpBehaviour
     {
-        //Unity assignments:
+        //Inspector values:
         [Header("Settings")]
         [SerializeField] float maxSteeringAnlgeDeg = 45;
 
@@ -20,8 +20,10 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         [SerializeField] WheeledVehicleBuilder linkedVehicleBuilder;
         [SerializeField] WheeledVehicleSeatController linkedDriverStation;
         [SerializeField] WheeledVehicleSync linkedVehicleSync;
+        [SerializeField] DriveDirectionInteractor LinkedDriveDirectionInteractor;
         [SerializeField] VRSteeringWheel LinkedVRSteeringWheel;
         [SerializeField] Transform LinkedSteeringWheelVisualizer;
+        [SerializeField] TMPro.TextMeshProUGUI speedIndicator;
 
         public BuilderUIController LinkedUI; //For updating vehicle during sync;
 
@@ -131,6 +133,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             if (Networking.LocalPlayer.IsUserInVR())
             {
                 LinkedVRSteeringWheel.gameObject.SetActive(true);
+                LinkedDriveDirectionInteractor.ColliderState = true;
             }
         }
 
@@ -143,6 +146,8 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                 LinkedVRSteeringWheel.gameObject.SetActive(false);
 
                 LinkedVRSteeringWheel.DropIfHeld();
+
+                LinkedDriveDirectionInteractor.ColliderState = false;
             }
         }
 
@@ -266,6 +271,8 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                 brakingInput = 1;
             }
 
+            LinkedDriveDirectionInteractor.ForwardDrive = driveInput > 0;
+
             LinkedSteeringWheelVisualizer.localRotation = Quaternion.Euler(0, 0, steeringInput * maxSteeringAnlgeDeg);
         }
 
@@ -308,6 +315,11 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                     break;
                 default:
                     break;
+            }
+
+            if(!LinkedDriveDirectionInteractor.ForwardDrive)
+            {
+                driveInput *= -1;
             }
         }
 
@@ -418,6 +430,8 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                 if (BeingDrivenLocally)
                 {
                     Control();
+
+                    speedIndicator.text = LinkedRigidbody.velocity.magnitude.ToString("F2") + " m/s";
                 }
 
                 UpdateWheelMeshPositionWhenOwner();

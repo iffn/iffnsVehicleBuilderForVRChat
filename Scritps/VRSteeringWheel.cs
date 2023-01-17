@@ -46,6 +46,14 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             initialLocalRotation = transform.localRotation;
         }
 
+        private void Start()
+        {
+            if (!Networking.LocalPlayer.IsUserInVR())
+            {
+                gameObject.SetActive(false);
+            }
+        }
+
         /*
         public void SetSteeringWheelPositionRelativeToPlayer()
         {
