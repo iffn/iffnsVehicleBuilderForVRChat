@@ -19,6 +19,9 @@ public class SeatController : UdonSharpBehaviour
 
     protected const float minAvatarDistance = 0.1f;
     protected const float maxAvatarDistance = 5f;
+    Collider attacheCollider;
+
+    VRCStation attachedStation;
 
     VRCPlayerApi seatedPlayer;
     public VRCPlayerApi SeatedPlayer
@@ -59,7 +62,8 @@ public class SeatController : UdonSharpBehaviour
     //Unity functions
     void Start()
     {
-        
+        attacheCollider = transform.GetComponent<Collider>();
+        attachedStation = transform.GetComponent<VRCStation>();
     }
 
     private void Update()
@@ -80,6 +84,13 @@ public class SeatController : UdonSharpBehaviour
     public void ForceEnter()
     {
         Networking.LocalPlayer.UseAttachedStation();
+    }
+
+    public void ForceExit()
+    {
+        if (seatedPlayer == null || !seatedPlayer.isLocal) return;
+
+        attachedStation.ExitStation(Networking.LocalPlayer);
     }
 
     void PositionStation(VRCPlayerApi player)
@@ -143,6 +154,7 @@ public class SeatController : UdonSharpBehaviour
     public override void OnStationEntered(VRCPlayerApi player)
     {
         seatedPlayer = player;
+        attacheCollider.enabled = false;
 
         if (!player.isLocal) return;
 
@@ -155,10 +167,12 @@ public class SeatController : UdonSharpBehaviour
     public override void OnStationExited(VRCPlayerApi player)
     {
         if (!player.isLocal) return;
+        attacheCollider.enabled = true;
 
         playerMover.localPosition = Vector3.zero;
 
         entryTime = Mathf.NegativeInfinity;
+
     }
 }
 

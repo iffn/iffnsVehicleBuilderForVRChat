@@ -277,23 +277,15 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             switch (LinkedVRSteeringWheel.currentHand)
             {
                 case VRC_Pickup.PickupHand.None:
+                    if(rightJoystickInput.magnitude > 0.3f)
+                    {
+                        linkedDriverStation.ForceExit();
+                    }
                     return;
                 case VRC_Pickup.PickupHand.Left:
                     driveInput = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger");
                     brakingInput = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger");
-                    if(rightJoystickInput.y > 0)
-                    {
-                        driveInput = Mathf.Clamp01(driveInput + rightJoystickInput.y);
-                    }
-                    else
-                    {
-                        brakingInput = Mathf.Clamp01(brakingInput - rightJoystickInput.y);
-                    }
-                    break;
-                case VRC_Pickup.PickupHand.Right:
-                    driveInput = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger");
-                    brakingInput = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger");
-                    if (leftJoystickInput.y > 0)
+                    if(leftJoystickInput.y > 0)
                     {
                         driveInput = Mathf.Clamp01(driveInput + leftJoystickInput.y);
                     }
@@ -302,11 +294,22 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                         brakingInput = Mathf.Clamp01(brakingInput - leftJoystickInput.y);
                     }
                     break;
+                case VRC_Pickup.PickupHand.Right:
+                    driveInput = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger");
+                    brakingInput = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger");
+                    if (rightJoystickInput.y > 0)
+                    {
+                        driveInput = Mathf.Clamp01(driveInput + rightJoystickInput.y);
+                    }
+                    else
+                    {
+                        brakingInput = Mathf.Clamp01(brakingInput - rightJoystickInput.y);
+                    }
+                    break;
                 default:
                     break;
             }
         }
-
 
         void Start()
         {
