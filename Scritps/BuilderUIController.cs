@@ -18,6 +18,8 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         [SerializeField] FloatInputLineController GroundClearanceInput;
         [SerializeField] InputField[] CenterOfMassXYZInputFields;
         [SerializeField] InputField NumberOfSeatRowsInputField;
+        [SerializeField] FloatInputLineController SeatLengthRatioInput;
+        [SerializeField] FloatInputLineController SeatWidthRatioInput;
         [SerializeField] Toggle[] SeatsMirroredToggle;
 
         //Wheels
@@ -115,6 +117,9 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                 linkedVehicleBuilder.numberOfSeatRows = currentInt;
             }
 
+            linkedVehicleBuilder.seatLenghtRatio = SeatLengthRatioInput.Value;
+            linkedVehicleBuilder.seatWidthRatio = SeatWidthRatioInput.Value;
+
             for (int i = 0; i < SeatsMirroredToggle.Length; i++)
             {
                 linkedVehicleBuilder.seatsMirrored[i] = SeatsMirroredToggle[i].isOn;
@@ -174,7 +179,10 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             CenterOfMassXYZInputFields[1].text = linkedVehicleBuilder.centerOfMassPositionRelativeToCenterBottom.y.ToString();
             CenterOfMassXYZInputFields[2].text = linkedVehicleBuilder.centerOfMassPositionRelativeToCenterBottom.z.ToString();
             NumberOfSeatRowsInputField.text = linkedVehicleBuilder.numberOfSeatRows.ToString();
-            
+
+            SeatLengthRatioInput.Value = linkedVehicleBuilder.seatLenghtRatio;
+            SeatWidthRatioInput.Value = linkedVehicleBuilder.seatWidthRatio;
+
             for(int i = 0; i<WheeledVehicleBuilder.maxSeatRows; i++)
             {
                 SeatsMirroredToggle[i].isOn = linkedVehicleBuilder.seatsMirrored[i];
@@ -242,8 +250,10 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             MassInput.Setup(this, 800, 6000, 1000, seriousMode);
             WidthWithWheelsInput.Setup(this, 1, 4, 3, seriousMode);
             LengthInput.Setup(this, 1, 6, 4, seriousMode);
-            GroundClearanceInput.Setup(this, 0.05f, 2f, 0.2f, seriousMode);
-            WheelRadiusInput.Setup(this, 0.1f, 2f, 1, seriousMode);
+            GroundClearanceInput.Setup(this, 0.05f, 1f, 0.2f, seriousMode);
+            SeatLengthRatioInput.Setup(this, 0.05f, 1f, 0.8f, seriousMode);
+            SeatWidthRatioInput.Setup(this, 0.05f, 1f, 0.8f, seriousMode);
+            WheelRadiusInput.Setup(this, 0.1f, 1f, 0.5f, seriousMode);
             WheelWidthInput.Setup(this, 0.1f, 1, 0.2f, seriousMode);
             MotorTorqueInput.Setup(this, 100, 3000, 400, seriousMode);
             BreakTorqueInput.Setup(this, 100, 3000, 500, seriousMode);

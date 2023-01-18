@@ -32,6 +32,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         public const int minWheels = 4;
         public const int maxWheels = 12;
         public const int maxSeatRows = 5;
+        public const float seatWidth = 0.45f;
 
         //Bulid parameters:
         //-----------------
@@ -43,6 +44,8 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         [UdonSynced(UdonSyncMode.None)] public float groundClearance;
         [UdonSynced(UdonSyncMode.None)] public Vector3 centerOfMassPositionRelativeToCenterBottom;
         [UdonSynced(UdonSyncMode.None)] public int numberOfSeatRows;
+        [UdonSynced(UdonSyncMode.None)] public float seatLenghtRatio;
+        [UdonSynced(UdonSyncMode.None)] public float seatWidthRatio;
         [UdonSynced(UdonSyncMode.None)] public bool[] seatsMirrored;
 
         //Wheels
@@ -84,6 +87,9 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         public void SetInitialParameters()
         {
             mass = 1000;
+
+            seatWidthRatio = 0.35f;
+            seatLenghtRatio = 0.5f;
 
             switch (initialVehicleType)
             {
@@ -376,8 +382,9 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             CenterOfGravityIndicator.transform.localPosition = centerOfMassPositionRelativeToCenterBottom;
 
             //Seats
-            float seatXPos = 0.3f;
-            float seatZPosOffset = length * 0.5f / (numberOfSeatRows - 1);
+
+            float seatXPos = (widthWithWheels - seatWidth) * 0.5f * seatWidthRatio;
+            float seatZPosOffset = (numberOfSeatRows != 1) ? (length-seatWidth) * seatLenghtRatio / (numberOfSeatRows - 1) : 0;
             float seatHeight = wheelRadius + 0.1f; //+0.1 because of body thickness
 
             for(int i = 0; i < maxSeatRows; i++)
@@ -387,7 +394,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
                 if(i < numberOfSeatRows)
                 {
-                    float zPos = length * 0.25f - seatZPosOffset * i;
+                    float zPos = length * seatLenghtRatio * 0.5f - seatZPosOffset * i;
 
                     AvailableSeats[firstSeat].gameObject.SetActive(true);
 
