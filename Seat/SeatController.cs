@@ -166,6 +166,8 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
         public override void OnStationExited(VRCPlayerApi player)
         {
+            seatedPlayer = null;
+
             if (!player.isLocal) return;
             attacheCollider.enabled = true;
 

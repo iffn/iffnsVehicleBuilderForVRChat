@@ -22,6 +22,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         [SerializeField] WheeledVehicleSync linkedVehicleSync;
         [SerializeField] DriveDirectionInteractor LinkedDriveDirectionInteractor;
         [SerializeField] VRSteeringWheel LinkedVRSteeringWheel;
+        [SerializeField] MapDisplay LinkedMapDisplay;
         [SerializeField] Transform LinkedSteeringWheelVisualizer;
         [SerializeField] TMPro.TextMeshProUGUI speedIndicator;
 
@@ -135,6 +136,8 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                 LinkedVRSteeringWheel.gameObject.SetActive(true);
                 LinkedDriveDirectionInteractor.ColliderState = true;
             }
+
+            LinkedMapDisplay.gameObject.SetActive(true);
         }
 
         public void ExitedDriverSeat()
@@ -149,6 +152,8 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
                 LinkedDriveDirectionInteractor.ColliderState = false;
             }
+
+            LinkedMapDisplay.gameObject.SetActive(false);
         }
 
         bool beingDrivenLocally = false;
@@ -271,7 +276,10 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                 brakingInput = 1;
             }
 
-            LinkedDriveDirectionInteractor.ForwardDrive = driveInput > 0;
+            if(!Networking.LocalPlayer.IsUserInVR())
+            {
+                LinkedDriveDirectionInteractor.ForwardDrive = driveInput > 0;
+            }
 
             LinkedSteeringWheelVisualizer.localRotation = Quaternion.Euler(0, 0, steeringInput * maxSteeringAnlgeDeg);
         }
@@ -365,6 +373,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             linkedVehicleBuilder.Setup(linkedController: this);
             LinkedUI.Setup(linkedVehicle: this);
             LinkedVRSteeringWheel.Setup(maxSteeringAnlgeDeg);
+            LinkedMapDisplay.gameObject.SetActive(false);
 
             //Setup builder
 

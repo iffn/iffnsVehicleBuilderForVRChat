@@ -58,6 +58,8 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         public override void Interact()
         {
             forwardDrive = !forwardDrive;
+
+            SetPosition();
         }
     }
 }
