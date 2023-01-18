@@ -12,21 +12,21 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         WheeledVehicleBuilder linkedVehicleBuilder;
 
         //Vehicle
-        [SerializeField] InputField MassInputField;
-        [SerializeField] InputField widthWithWheelsInputField;
-        [SerializeField] InputField lengthInputField;
-        [SerializeField] InputField groundClearanceInputField;
+        [SerializeField] FloatInputLineController MassInput;
+        [SerializeField] FloatInputLineController WidthWithWheelsInput;
+        [SerializeField] FloatInputLineController LengthInput;
+        [SerializeField] FloatInputLineController GroundClearanceInput;
         [SerializeField] InputField[] CenterOfMassXYZInputFields;
         [SerializeField] InputField NumberOfSeatRowsInputField;
         [SerializeField] Toggle[] SeatsMirroredToggle;
 
         //Wheels
         [SerializeField] InputField NumberOfWheelsInputField;
-        [SerializeField] InputField WheelRadiusInputField;
-        [SerializeField] InputField WheelWidthInputField;
+        [SerializeField] FloatInputLineController WheelRadiusInput;
+        [SerializeField] FloatInputLineController WheelWidthInput;
         [SerializeField] Toggle[] DrivenWheelToggle;
-        [SerializeField] InputField MotorTorqueInputField;
-        [SerializeField] InputField BreakTorqueInputField;
+        [SerializeField] FloatInputLineController MotorTorqueInput;
+        [SerializeField] FloatInputLineController BreakTorqueInput;
         [SerializeField] InputField[] SteeringAngleInputField;
 
         [SerializeField] Button ClaimOwnershipButton;
@@ -38,6 +38,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
         bool editInProgress = false;
         bool skipUICalls = false;
+        bool seriousMode = true;
 
         private void Update()
         {
@@ -91,25 +92,13 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             float x, y, z;
 
             //Vehicle
-            if (float.TryParse(MassInputField.text, out currentFloat))
-            {
-                linkedVehicleBuilder.mass = currentFloat;
-            }
+            linkedVehicleBuilder.mass = MassInput.Value;
 
-            if (float.TryParse(widthWithWheelsInputField.text, out currentFloat))
-            {
-                linkedVehicleBuilder.widthWithWheels = currentFloat;
-            }
+            linkedVehicleBuilder.widthWithWheels = WidthWithWheelsInput.Value;
 
-            if (float.TryParse(lengthInputField.text, out currentFloat))
-            {
-                linkedVehicleBuilder.length = currentFloat;
-            }
+            linkedVehicleBuilder.length = LengthInput.Value;
 
-            if (float.TryParse(groundClearanceInputField.text, out currentFloat))
-            {
-                linkedVehicleBuilder.groundClearance = currentFloat;
-            }
+            linkedVehicleBuilder.groundClearance = GroundClearanceInput.Value;
 
             if (float.TryParse(CenterOfMassXYZInputFields[0].text, out x)
                 && float.TryParse(CenterOfMassXYZInputFields[1].text, out y)
@@ -144,30 +133,17 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                 linkedVehicleBuilder.numberOfWheels = currentInt;
             }
 
-            if (float.TryParse(WheelRadiusInputField.text, out currentFloat))
-            {
-                linkedVehicleBuilder.wheelRadius = currentFloat;
-            }
+            linkedVehicleBuilder.wheelRadius = WheelRadiusInput.Value;
 
-            if (float.TryParse(WheelWidthInputField.text, out currentFloat))
-            {
-                linkedVehicleBuilder.wheelWidth = currentFloat;
-            }
+            linkedVehicleBuilder.wheelWidth = WheelWidthInput.Value;
 
             for (int i = 0; i < linkedVehicleBuilder.drivenWheelPairs.Length; i++)
             {
                 linkedVehicleBuilder.drivenWheelPairs[i] = DrivenWheelToggle[i].isOn;
             }
 
-            if (float.TryParse(MotorTorqueInputField.text, out currentFloat))
-            {
-                linkedVehicleBuilder.motorTorquePerDrivenWheel = currentFloat;
-            }
-
-            if (float.TryParse(BreakTorqueInputField.text, out currentFloat))
-            {
-                linkedVehicleBuilder.breakTorquePerWheel = currentFloat;
-            }
+            linkedVehicleBuilder.motorTorquePerDrivenWheel = MotorTorqueInput.Value;
+            linkedVehicleBuilder.breakTorquePerWheel = BreakTorqueInput.Value;
 
             for (int i = 0; i < linkedVehicleBuilder.steeringAngleDeg.Length; i++)
             {
@@ -189,10 +165,11 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             skipUICalls = true;
 
             //Vehicle
-            MassInputField.text = linkedVehicleBuilder.mass.ToString();
-            widthWithWheelsInputField.text = linkedVehicleBuilder.widthWithWheels.ToString();
-            lengthInputField.text = linkedVehicleBuilder.length.ToString();
-            groundClearanceInputField.text = linkedVehicleBuilder.groundClearance.ToString();
+            MassInput.Value = linkedVehicleBuilder.mass;
+            WidthWithWheelsInput.Value = linkedVehicleBuilder.widthWithWheels;
+            //widthWithWheelsInputField.text = linkedVehicleBuilder.widthWithWheels.ToString();
+            LengthInput.Value = linkedVehicleBuilder.length;
+            GroundClearanceInput.Value = linkedVehicleBuilder.groundClearance;
             CenterOfMassXYZInputFields[0].text = linkedVehicleBuilder.centerOfMassPositionRelativeToCenterBottom.x.ToString();
             CenterOfMassXYZInputFields[1].text = linkedVehicleBuilder.centerOfMassPositionRelativeToCenterBottom.y.ToString();
             CenterOfMassXYZInputFields[2].text = linkedVehicleBuilder.centerOfMassPositionRelativeToCenterBottom.z.ToString();
@@ -205,16 +182,16 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
             //Wheels
             NumberOfWheelsInputField.text = linkedVehicleBuilder.numberOfWheels.ToString();
-            WheelRadiusInputField.text = linkedVehicleBuilder.wheelRadius.ToString();
-            WheelWidthInputField.text = linkedVehicleBuilder.wheelWidth.ToString();
+            WheelRadiusInput.Value = linkedVehicleBuilder.wheelRadius;
+            WheelWidthInput.Value = linkedVehicleBuilder.wheelWidth;
 
             for (int i = 0; i < WheeledVehicleBuilder.maxWheels / 2; i++)
             {
                 DrivenWheelToggle[i].isOn = linkedVehicleBuilder.drivenWheelPairs[i];
             }
 
-            MotorTorqueInputField.text = linkedVehicleBuilder.motorTorquePerDrivenWheel.ToString();
-            BreakTorqueInputField.text = linkedVehicleBuilder.breakTorquePerWheel.ToString();
+            MotorTorqueInput.Value = linkedVehicleBuilder.motorTorquePerDrivenWheel;
+            BreakTorqueInput.Value = linkedVehicleBuilder.breakTorquePerWheel;
 
             for (int i = 0; i < WheeledVehicleBuilder.maxWheels / 2; i++)
             {
@@ -261,6 +238,15 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         {
             this.linkedVehicle = linkedVehicle;
             linkedVehicleBuilder = linkedVehicle.LinkedVehicleBuilder;
+
+            MassInput.Setup(this, 800, 6000, 1000, seriousMode);
+            WidthWithWheelsInput.Setup(this, 1, 4, 3, seriousMode);
+            LengthInput.Setup(this, 1, 6, 4, seriousMode);
+            GroundClearanceInput.Setup(this, 0.05f, 2f, 0.2f, seriousMode);
+            WheelRadiusInput.Setup(this, 0.1f, 2f, 1, seriousMode);
+            WheelWidthInput.Setup(this, 0.1f, 1, 0.2f, seriousMode);
+            MotorTorqueInput.Setup(this, 100, 3000, 400, seriousMode);
+            BreakTorqueInput.Setup(this, 100, 3000, 500, seriousMode);
 
             SetVehicleOwnerDisplay(Networking.GetOwner(this.linkedVehicle.LinkedVehicleSync.gameObject));
         }
