@@ -33,10 +33,13 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         [SerializeField] FloatInputLineController BreakTorqueInput;
         [SerializeField] InputField[] SteeringAngleInputField;
 
-        [SerializeField] Button ClaimOwnershipButton;
+        //[SerializeField] Button ClaimOwnershipButton;
         [SerializeField] UnityEngine.UI.Text CurrentOwnerName;
 
-        [SerializeField] Button RespawnButton;
+        [SerializeField] GameObject[] OwnerObjects;
+        [SerializeField] GameObject[] NonOwnerObjects;
+
+        //[SerializeField] Button RespawnButton;
 
         [SerializeField] Toggle FixVehicleToggle;
 
@@ -233,8 +236,18 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         {
             bool locallyOwned = owner.isLocal;
 
-            ClaimOwnershipButton.gameObject.SetActive(!locallyOwned);
-            RespawnButton.gameObject.SetActive(locallyOwned);
+            foreach(GameObject o in OwnerObjects)
+            {
+                o.SetActive(locallyOwned);
+            }
+
+            foreach (GameObject o in NonOwnerObjects)
+            {
+                o.SetActive(!locallyOwned);
+            }
+
+            //ClaimOwnershipButton.gameObject.SetActive(!locallyOwned);
+            //RespawnButton.gameObject.SetActive(locallyOwned);
 
             CurrentOwnerName.text = owner.playerId + ": " + owner.displayName;
         }

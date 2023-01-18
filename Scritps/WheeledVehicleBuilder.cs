@@ -126,7 +126,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                     widthWithWheels = 1.8f;
                     length = 3f;
                     groundClearance = 0.3f;
-                    centerOfMassPositionRelativeToCenterBottom = 0.5f * Vector3.up;
+                    centerOfMassPositionRelativeToCenterBottom = 0.3f * Vector3.up;
                     numberOfSeatRows = 2;
 
                     for (int i = 0; i < seatsMirrored.Length; i++)
@@ -141,8 +141,8 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                     breakTorquePerWheel = 500;
 
                     drivenWheelPairs[0] = true;
-                    drivenWheelPairs[1] = true;
-                    drivenWheelPairs[2] = true;
+                    drivenWheelPairs[1] = false;
+                    drivenWheelPairs[2] = false;
 
                     steeringAngleDeg[0] = -25;
                     break;

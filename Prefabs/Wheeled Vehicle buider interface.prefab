@@ -182,7 +182,7 @@ GameObject:
   - component: {fileID: 2745438943951129629}
   - component: {fileID: 2411887111911979468}
   m_Layer: 0
-  m_Name: Respawn vehicle
+  m_Name: O-Respawn vehicle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4834,7 +4834,7 @@ GameObject:
   - component: {fileID: 13457324637707893}
   - component: {fileID: 4845048115762473878}
   m_Layer: 0
-  m_Name: Owner title (1)
+  m_Name: O-Owner title (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6019,7 +6019,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3107427610240326687}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 0.001}
   m_Children:
   - {fileID: 3107427610878638981}
@@ -6030,9 +6030,9 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0.2236, y: 0.906}
+  m_AnchoredPosition: {x: 0.2236, y: 0}
   m_SizeDelta: {x: 2.4471788, y: 2.0822413}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_Pivot: {x: 0.5, y: 0}
 --- !u!223 &3107427610240326682
 Canvas:
   m_ObjectHideFlags: 0
@@ -9193,7 +9193,7 @@ Transform:
   m_GameObject: {fileID: 3107427611905968504}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.7553, y: 1.7553, z: 1.7553}
   m_Children:
   - {fileID: 3107427610240326681}
   m_Father: {fileID: 0}
@@ -9257,9 +9257,17 @@ MonoBehaviour:
   - {fileID: 3914609942480038071}
   - {fileID: 6221001741876864876}
   - {fileID: 9175659836158004728}
-  ClaimOwnershipButton: {fileID: 1683578403603255844}
   CurrentOwnerName: {fileID: 3180237032516056903}
-  RespawnButton: {fileID: 2411887111911979468}
+  OwnerObjects:
+  - {fileID: 70865452897945361}
+  - {fileID: 4949427717507967910}
+  - {fileID: 8378461890657644333}
+  - {fileID: 6735486249643359125}
+  - {fileID: 2695347532813054133}
+  - {fileID: 6784984199645928884}
+  - {fileID: 8801939687852368385}
+  NonOwnerObjects:
+  - {fileID: 3312562361044339232}
   FixVehicleToggle: {fileID: 0}
 --- !u!114 &2968391066160689930
 MonoBehaviour:
@@ -9300,7 +9308,7 @@ GameObject:
   - component: {fileID: 786377403603890738}
   - component: {fileID: 1683578403603255844}
   m_Layer: 0
-  m_Name: Claim vehicle button
+  m_Name: NO-Claim vehicle button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11327,7 +11335,7 @@ GameObject:
   - component: {fileID: 9177291674249111258}
   - component: {fileID: 4098985143608249380}
   m_Layer: 0
-  m_Name: Space (1)
+  m_Name: O-Space (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -13117,7 +13125,7 @@ GameObject:
   - component: {fileID: 9044606539787138837}
   - component: {fileID: 6253739629471231952}
   m_Layer: 0
-  m_Name: Space
+  m_Name: O-Space
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -13182,7 +13190,7 @@ GameObject:
   - component: {fileID: 4924340450164476874}
   - component: {fileID: 8468982559173276877}
   m_Layer: 0
-  m_Name: ATV preset
+  m_Name: O-ATV preset
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -15458,7 +15466,7 @@ GameObject:
   - component: {fileID: 166169442031454253}
   - component: {fileID: 496837120330217481}
   m_Layer: 0
-  m_Name: Serious mode
+  m_Name: O-Serious mode
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -16348,7 +16356,7 @@ GameObject:
   - component: {fileID: 2209446547191962899}
   - component: {fileID: 3306644888366299995}
   m_Layer: 0
-  m_Name: Car preset
+  m_Name: O-Car preset
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
