@@ -84,14 +84,14 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             Networking.SetOwner(Networking.LocalPlayer, gameObject);
         }
 
-        public void SetInitialParameters()
+        public void SetBuildParameters(PresetVehicleTypes preset)
         {
             mass = 1000;
 
             seatWidthRatio = 0.35f;
             seatLenghtRatio = 0.5f;
 
-            switch (initialVehicleType)
+            switch (preset)
             {
                 case PresetVehicleTypes.ATV6Wheel:
 
@@ -102,7 +102,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                     numberOfSeatRows = 3;
                     seatsMirrored[0] = false;
 
-                    for(int i = 1; i< seatsMirrored.Length; i++)
+                    for (int i = 1; i < seatsMirrored.Length; i++)
                     {
                         seatsMirrored[i] = true;
                     }
@@ -128,7 +128,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                     groundClearance = 0.3f;
                     centerOfMassPositionRelativeToCenterBottom = 0.5f * Vector3.up;
                     numberOfSeatRows = 2;
-                    
+
                     for (int i = 0; i < seatsMirrored.Length; i++)
                     {
                         seatsMirrored[i] = true;
@@ -152,7 +152,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                     groundClearance = 1.2f;
                     centerOfMassPositionRelativeToCenterBottom = 0.5f * Vector3.up;
                     numberOfSeatRows = 1;
-                    
+
                     for (int i = 0; i < seatsMirrored.Length; i++)
                     {
                         seatsMirrored[i] = true;
@@ -173,6 +173,15 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                 default:
                     break;
             }
+
+            linkedController.LinkedUI.UpdateUIFromVehicle();
+
+            BuildFromParameters();
+        }
+
+        public void SetInitialParameters()
+        {
+            SetBuildParameters(initialVehicleType);
         }
 
         bool usesValidBuildParameters()

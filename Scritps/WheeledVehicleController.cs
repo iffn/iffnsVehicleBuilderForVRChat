@@ -379,10 +379,6 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
             linkedVehicleBuilder.SetInitialParameters();
 
-            LinkedUI.UpdateUIFromVehicle();
-
-            linkedVehicleBuilder.BuildFromParameters();
-
             UpdateParametersBasedOnOwnership();
 
             originalLocalPosition = transform.localPosition;

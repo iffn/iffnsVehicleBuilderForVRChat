@@ -8,8 +8,10 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 {
     public class BuilderUIController : UdonSharpBehaviour
     {
-        WheeledVehicleController linkedVehicle;
+        
+        [Header("Unity assingments")]
         WheeledVehicleBuilder linkedVehicleBuilder;
+        WheeledVehicleController linkedVehicle;
 
         //Vehicle
         [SerializeField] FloatInputLineController MassInput;
@@ -264,6 +266,11 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         void Start()
         {
             //Use Setup started by Vehicle instead
+        }
+
+        public void SetVehiclePreset(PresetVehicleTypes types)
+        {
+            linkedVehicleBuilder.SetBuildParameters(types);
         }
     }
 }
