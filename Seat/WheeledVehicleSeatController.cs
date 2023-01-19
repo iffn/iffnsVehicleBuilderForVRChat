@@ -18,6 +18,8 @@ public class WheeledVehicleSeatController : SeatController
 
         linkedVRCStaion = transform.GetComponent<VRCStation>();
         linkedVRCStaion.disableStationExit = true;
+
+        linkedVRCStaion.canUseStationFromStation = false; //Set in script since prefab values don't get saved
     }
 
     protected override void UpdateFunction()
