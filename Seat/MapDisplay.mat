@@ -82,4 +82,4 @@ Material:
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _WindowPosition: {r: 0.60337245, g: 0.34579462, b: -12.611103, a: 0}
+    - _WindowPosition: {r: 0.58538777, g: 0.3333431, b: -12.48988, a: 0}

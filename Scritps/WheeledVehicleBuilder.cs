@@ -11,6 +11,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         //Parameters to be set in Unity
         [SerializeField] WheelCollider WheelPrefab;
         [SerializeField] SeatController[] AvailableSeats;
+        [SerializeField] Transform FlagMover;
 
         //Body mesh templates
         [SerializeField] GameObject CenterFrontTemplate;
@@ -60,7 +61,6 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
         //Funcitons:
         //----------
-
         public bool EnableStationEntry
         {
             set
@@ -257,6 +257,8 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             yScale = Mathf.Clamp(yScale, 0.1f, 10);
 
             BodyHolder.localScale = new Vector3(1, yScale, 1); // Shortened from (2*r - d)/r 
+
+            FlagMover.localPosition = new Vector3(0, groundClearance + yScale * 0.5f, -length * 0.5f);
 
             //Cleanup body
             for (int i = 0; i < BodyMeshes.Length; i++)
