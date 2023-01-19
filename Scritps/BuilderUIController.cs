@@ -62,17 +62,6 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             linkedVehicle.VehicleFixed = FixVehicleToggle.isOn;
         }
 
-        public void UpdateInputArrays()
-        {
-            for (int i = 0; i < WheeledVehicleBuilder.maxWheels / 2; i++)
-            {
-                bool active = i < linkedVehicleBuilder.numberOfWheels / 2;
-
-                DrivenWheelToggle[i].gameObject.SetActive(active);
-                SteeringAngleInputField[i].gameObject.SetActive(active);
-            }
-        }
-
         public void UpdateVehicleFromUI()
         {
             if (skipUICalls) return;
@@ -225,7 +214,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
             for (int i = 0; i < WheeledVehicleBuilder.maxWheels / 2; i++)
             {
-                bool isActive = i < linkedVehicleBuilder.numberOfWheels;
+                bool isActive = i < linkedVehicleBuilder.numberOfWheels / 2;
 
                 DrivenWheelToggle[i].gameObject.SetActive(isActive);
                 SteeringAngleInputField[i].gameObject.SetActive(isActive);
@@ -284,6 +273,46 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         public void SetVehiclePreset(PresetVehicleTypes types)
         {
             linkedVehicleBuilder.SetBuildParameters(types);
+        }
+
+        public void AddSeatRow()
+        {
+            if (linkedVehicleBuilder.numberOfSeatRows > 4) return;
+
+            linkedVehicleBuilder.numberOfSeatRows += 1;
+
+            linkedVehicleBuilder.BuildFromParameters();
+            UpdateUIFromVehicle();
+        }
+
+        public void SubtractSeatRow()
+        {
+            if (linkedVehicleBuilder.numberOfSeatRows < 2) return;
+
+            linkedVehicleBuilder.numberOfSeatRows -= 1;
+
+            linkedVehicleBuilder.BuildFromParameters();
+            UpdateUIFromVehicle();
+        }
+
+        public void AddWheelPair()
+        {
+            if (linkedVehicleBuilder.numberOfWheels > 10) return;
+
+            linkedVehicleBuilder.numberOfWheels += 2;
+
+            linkedVehicleBuilder.BuildFromParameters();
+            UpdateUIFromVehicle();
+        }
+
+        public void RemoveWheelPair()
+        {
+            if (linkedVehicleBuilder.numberOfWheels < 6) return;
+
+            linkedVehicleBuilder.numberOfWheels -= 2;
+
+            linkedVehicleBuilder.BuildFromParameters();
+            UpdateUIFromVehicle();
         }
     }
 }
