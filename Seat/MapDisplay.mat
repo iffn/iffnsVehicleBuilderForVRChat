@@ -76,10 +76,10 @@ Material:
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _UVSec: 0
-    - _WindowSize: 0.24414074
+    - _WindowSize: 0.24414076
     - _ZWrite: 1
     - __dirty: 1
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _WindowPosition: {r: 0.58538777, g: 0.3333431, b: -12.48988, a: 0}
+    - _WindowPosition: {r: 0.6033612, g: 0.34577036, b: -12.421301, a: 0}

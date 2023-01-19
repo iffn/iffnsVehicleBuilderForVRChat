@@ -22,6 +22,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         [SerializeField] WheeledVehicleSync linkedVehicleSync;
         [SerializeField] DriveDirectionInteractor LinkedDriveDirectionInteractor;
         [SerializeField] VRSteeringWheel LinkedVRSteeringWheel;
+        [SerializeField] VRBreakHolder LinkedVRBreakHolder;
         [SerializeField] MapDisplay LinkedMapDisplay;
         [SerializeField] Transform LinkedSteeringWheelVisualizer;
         [SerializeField] TMPro.TextMeshProUGUI speedIndicator;
@@ -45,7 +46,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         //Runtime parameters:
         float driveInput = 0;
         float steeringInput = 0;
-        float brakingInput = 1;
+        float breakingInput = 1;
 
         public float wheelSyncAdjuster = 0.08f;
         //float assumedWheelRotation = 0;
@@ -134,6 +135,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             if (Networking.LocalPlayer.IsUserInVR())
             {
                 LinkedVRSteeringWheel.gameObject.SetActive(true);
+                LinkedVRBreakHolder.gameObject.SetActive(true);
                 LinkedDriveDirectionInteractor.ColliderState = true;
             }
 
@@ -147,8 +149,10 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             if (Networking.LocalPlayer.IsUserInVR())
             {
                 LinkedVRSteeringWheel.gameObject.SetActive(false);
+                LinkedVRBreakHolder.gameObject.SetActive(false);
 
                 LinkedVRSteeringWheel.DropIfHeld();
+                LinkedVRBreakHolder.DropIfHeld();
 
                 LinkedDriveDirectionInteractor.ColliderState = false;
             }
@@ -224,7 +228,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
                 wheelColliders[i].steerAngle = steeringAngleDeg[symetricArrayIndex] * steeringInput;
 
-                wheelColliders[i].brakeTorque = breakTorquePerWheel * brakingInput;
+                wheelColliders[i].brakeTorque = breakTorquePerWheel * breakingInput;
             }
         }
 
@@ -232,13 +236,13 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         {
             driveInput = 0;
             steeringInput = 0;
-            brakingInput = 1;
+            breakingInput = 1;
         }
 
         void Control()
         {
             driveInput = 0;
-            brakingInput = 0;
+            breakingInput = 0;
             steeringInput = 0;
 
             if (Networking.LocalPlayer.IsUserInVR())
@@ -273,7 +277,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
             if (Input.GetKey(KeyCode.Space))
             {
-                brakingInput = 1;
+                breakingInput = 1;
             }
 
             if(!Networking.LocalPlayer.IsUserInVR())
@@ -299,31 +303,31 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                     return;
                 case VRC_Pickup.PickupHand.Left:
                     driveInput = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger");
-                    brakingInput = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger");
                     if(leftJoystickInput.y > 0)
                     {
                         driveInput = Mathf.Clamp01(driveInput + leftJoystickInput.y);
                     }
                     else
                     {
-                        brakingInput = Mathf.Clamp01(brakingInput - leftJoystickInput.y);
+                        breakingInput = Mathf.Clamp01(breakingInput - leftJoystickInput.y);
                     }
                     break;
                 case VRC_Pickup.PickupHand.Right:
                     driveInput = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger");
-                    brakingInput = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger");
                     if (rightJoystickInput.y > 0)
                     {
                         driveInput = Mathf.Clamp01(driveInput + rightJoystickInput.y);
                     }
                     else
                     {
-                        brakingInput = Mathf.Clamp01(brakingInput - rightJoystickInput.y);
+                        breakingInput = Mathf.Clamp01(breakingInput - rightJoystickInput.y);
                     }
                     break;
                 default:
                     break;
             }
+
+            breakingInput = Mathf.Clamp01(breakingInput + LinkedVRBreakHolder.BreakInput);
 
             if(!LinkedDriveDirectionInteractor.ForwardDrive)
             {
@@ -374,6 +378,8 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             LinkedUI.Setup(linkedVehicle: this);
             LinkedVRSteeringWheel.Setup(maxSteeringAnlgeDeg);
             LinkedMapDisplay.gameObject.SetActive(false);
+
+            LinkedVRBreakHolder.gameObject.SetActive(false);
 
             //Setup builder
 
