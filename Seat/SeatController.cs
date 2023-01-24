@@ -13,7 +13,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         [SerializeField] protected Transform targetHeadPosition;
         [SerializeField] protected Transform targetHipPosition;
         [SerializeField] Transform playerMover;
-        [SerializeField] float positioningTime = 2;
+        [SerializeField] float positioningTime = 0.3f;
 
         float entryTime = Mathf.NegativeInfinity;
 

@@ -290,8 +290,6 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
         void ApplyVRControls()
         {
-            LinkedVRSteeringWheel.UpdateControlls();
-
             //Check hand: Return if not held, otherwise get drive and brake inputs
             switch (LinkedVRSteeringWheel.currentHand)
             {

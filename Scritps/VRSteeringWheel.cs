@@ -89,6 +89,16 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             transform.localRotation = initialLocalRotation;
         }
 
+        private void LateUpdate()
+        {
+            if (!attachedPickup.IsHeld)
+            {
+                return;
+            }
+
+            steeringAngle = GetHandAngle() - initialAngle;
+        }
+
         float GetHandAngle()
         {
             Vector3 handPosition;
