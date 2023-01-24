@@ -10398,6 +10398,7 @@ MonoBehaviour:
   NonOwnerObjects:
   - {fileID: 3312562361044339232}
   FixVehicleToggle: {fileID: 0}
+  SeriousModeToggle: {fileID: 841132248144872746}
 --- !u!114 &2968391066160689930
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16466,7 +16467,7 @@ MonoBehaviour:
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: UpdateVehicleFromUI
+          m_StringArgument: SeriousModeUpdate
           m_BoolArgument: 0
         m_CallState: 2
   m_IsOn: 1

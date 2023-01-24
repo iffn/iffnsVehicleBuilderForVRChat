@@ -42,6 +42,9 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         //[SerializeField] Button RespawnButton;
 
         [SerializeField] Toggle FixVehicleToggle;
+        [SerializeField] Toggle SeriousModeToggle;
+
+        FloatInputLineController[] floatInputs;
 
         bool editInProgress = false;
         bool skipUICalls = false;
@@ -251,6 +254,8 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             this.linkedVehicle = linkedVehicle;
             linkedVehicleBuilder = linkedVehicle.LinkedVehicleBuilder;
 
+            seriousMode = SeriousModeToggle.isOn;
+
             MassInput.Setup(this, 800, 6000, 1000, seriousMode);
             WidthWithWheelsInput.Setup(this, 1, 4, 3, seriousMode);
             LengthInput.Setup(this, 1, 6, 4, seriousMode);
@@ -262,12 +267,37 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             MotorTorqueInput.Setup(this, 100, 3000, 400, seriousMode);
             BreakTorqueInput.Setup(this, 100, 3000, 500, seriousMode);
 
+            floatInputs = new FloatInputLineController[] {
+                MassInput,
+                WidthWithWheelsInput,
+                LengthInput,
+                GroundClearanceInput,
+                SeatLengthRatioInput,
+                SeatWidthRatioInput,
+                WheelRadiusInput,
+                WheelWidthInput,
+                MotorTorqueInput,
+                BreakTorqueInput
+            };
+
             SetVehicleOwnerDisplay(Networking.GetOwner(this.linkedVehicle.LinkedVehicleSync.gameObject));
         }
 
         void Start()
         {
             //Use Setup started by Vehicle instead
+        }
+
+        public void SeriousModeUpdate()
+        {
+            seriousMode = SeriousModeToggle.isOn;
+
+            foreach(FloatInputLineController input in floatInputs)
+            {
+                input.ApplyLimits = seriousMode;
+            }
+
+            if(seriousMode) UpdateVehicleFromUI();
         }
 
         public void SetVehiclePreset(PresetVehicleTypes types)

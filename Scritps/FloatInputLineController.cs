@@ -39,7 +39,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         {
             set
             {
-                bool update = applyLimits && !value;
+                bool update = !applyLimits && value; //Only update if switched on
 
                 applyLimits = value;
 
@@ -65,9 +65,9 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                 if (applyLimits) currentValue = Mathf.Clamp(value, min, max);
                 else currentValue = value;
 
-                LinkedSlider.value = value;
+                LinkedSlider.value = currentValue;
 
-                LinkedInputField.text = "" + value;
+                LinkedInputField.text = "" + currentValue;
 
                 ignoreCallback = false;
             }
