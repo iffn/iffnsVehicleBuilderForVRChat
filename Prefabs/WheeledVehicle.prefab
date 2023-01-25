@@ -1039,6 +1039,11 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2055950352071567861, guid: a26d2002d1a74e94dbdb38095f98568e,
         type: 3}
+    - target: {fileID: 2450538236822285014, guid: a26d2002d1a74e94dbdb38095f98568e,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 84bd75fbd5f7576408eee667a281da62, type: 2}
     - target: {fileID: 3333501864301093233, guid: a26d2002d1a74e94dbdb38095f98568e,
         type: 3}
       propertyPath: serializationData.Prefab
