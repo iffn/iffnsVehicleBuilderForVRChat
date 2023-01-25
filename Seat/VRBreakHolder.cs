@@ -7,11 +7,8 @@ using VRC.Udon.Common;
 
 namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 {
-    [RequireComponent(typeof(VRCPickup))]
-    public class VRBreakHolder : UdonSharpBehaviour
+    public class VRBreakHolder : CockpitPickup
     {
-        VRCPickup attachedPickup;
-
         float breakInput;
         Vector3 initialLocalPosition;
 
@@ -25,8 +22,6 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
         void Start()
         {
-            attachedPickup = GetComponent<VRCPickup>();
-
             if (!Networking.LocalPlayer.IsUserInVR())
             {
                 transform.parent.gameObject.SetActive(false);
@@ -34,11 +29,30 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             }
 
             initialLocalPosition = transform.localPosition;
+
+            Setup();
+        }
+
+        protected override void AdditionalLateUpdateFunctions()
+        {
+            switch (currentPickupHand)
+            {
+                case VRC_Pickup.PickupHand.None:
+                    break;
+                case VRC_Pickup.PickupHand.Left:
+                    transform.position = Networking.LocalPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position;
+                    break;
+                case VRC_Pickup.PickupHand.Right:
+                    transform.position = Networking.LocalPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).position;
+                    break;
+                default:
+                    break;
+            }
         }
 
         private void Update()
         {
-            switch (attachedPickup.currentHand)
+            switch (currentPickupHand)
             {
                 case VRC_Pickup.PickupHand.None:
                     break;
@@ -53,17 +67,10 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             }
         }
 
-        public void DropIfHeld()
-        {
-            if (attachedPickup.IsHeld)
-            {
-                attachedPickup.Drop();
-            }
-        }
-
-        public override void InputDrop(bool value, UdonInputEventArgs args)
+        protected override void DropOccured()
         {
             breakInput = 0;
+
             transform.localPosition = initialLocalPosition;
         }
     }

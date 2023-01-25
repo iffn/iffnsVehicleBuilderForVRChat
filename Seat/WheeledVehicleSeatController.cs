@@ -7,7 +7,6 @@ using VRC.Udon;
 
 public class WheeledVehicleSeatController : SeatController
 {
-    [SerializeField] Transform wheel;
     [SerializeField] Transform Scaler;
 
     WheeledVehicleController linkedVehicle;

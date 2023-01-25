@@ -134,10 +134,14 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
             if (Networking.LocalPlayer.IsUserInVR())
             {
+                Debug.Log("Entering Seat in VR and enabling VR steering wheel");
+
                 LinkedVRSteeringWheel.gameObject.SetActive(true);
                 LinkedVRBreakHolder.gameObject.SetActive(true);
-                LinkedDriveDirectionInteractor.ColliderState = true;
+                
             }
+
+            LinkedDriveDirectionInteractor.ColliderState = true;
 
             LinkedMapDisplay.gameObject.SetActive(true);
         }
@@ -148,14 +152,16 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
             if (Networking.LocalPlayer.IsUserInVR())
             {
+                Debug.Log("Exiting Seat in VR and disabling VR steering wheel");
+
+                LinkedVRSteeringWheel.ForceDropIfHeld();
+                LinkedVRBreakHolder.ForceDropIfHeld();
+
                 LinkedVRSteeringWheel.gameObject.SetActive(false);
                 LinkedVRBreakHolder.gameObject.SetActive(false);
-
-                LinkedVRSteeringWheel.DropIfHeld();
-                LinkedVRBreakHolder.DropIfHeld();
-
-                LinkedDriveDirectionInteractor.ColliderState = false;
             }
+
+            LinkedDriveDirectionInteractor.ColliderState = false;
 
             LinkedMapDisplay.gameObject.SetActive(false);
         }
@@ -291,7 +297,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         void ApplyVRControls()
         {
             //Check hand: Return if not held, otherwise get drive and brake inputs
-            switch (LinkedVRSteeringWheel.currentHand)
+            switch (LinkedVRSteeringWheel.currentPickupHand)
             {
                 case VRC_Pickup.PickupHand.None:
                     if(rightJoystickInput.magnitude > 0.3f)
@@ -432,8 +438,31 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             }
         }
 
+        bool debugActive = false;
+
+        void DebugFunction()
+        {
+            if(Input.GetKey(KeyCode.Home) || Input.GetAxis("Oculus_GearVR_RThumbstickY") > 0.8f)
+            {
+                if (debugActive) return;
+
+                //                                      V---Manually adjust this for each class ffs
+                Debug.Log($"Class {nameof(WheeledVehicleController)} of GameObject {gameObject.name} worked at {Time.time}");
+
+                Debug.Log($"{nameof(LinkedDriveDirectionInteractor)} collider activation = {LinkedDriveDirectionInteractor.ColliderState}");
+
+                debugActive = true;
+            }
+            else
+            {
+                debugActive = false;
+            }
+        }
+
         private void Update()
         {
+            DebugFunction();
+
             if (linkedVehicleSync.VehicleIsOwned)
             {
                 if (BeingDrivenLocally)

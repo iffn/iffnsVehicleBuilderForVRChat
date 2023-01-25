@@ -2,17 +2,19 @@
 using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
+using VRC.Udon.Common;
 
 namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 {
-    [RequireComponent(typeof(Collider))]
-    public class DriveDirectionInteractor : UdonSharpBehaviour
+    public class DriveDirectionInteractor : CockpitBaseTrigger
     {
         [Header("Settings")]
         [SerializeField] float directionalOffset;
 
         [Header("Unity assingments")]
         [SerializeField] Transform visualMover;
+
+        public bool ShowInteractionFeedback;
 
         bool forwardDrive = true;
 
@@ -37,6 +39,10 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             {
                 attachedCollider.enabled = value;
             }
+            get
+            {
+                return attachedCollider.enabled;
+            }
         }
 
         private void Start()
@@ -48,6 +54,14 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             attachedCollider.enabled = false;
         }
 
+        private void LateUpdate()
+        {
+            if (!ShowInteractionFeedback)
+            {
+                InteractionTriggerForLateUpdate();
+            }
+        }
+
         void SetPosition()
         {
             float offset = forwardDrive ? directionalOffset : -directionalOffset;
@@ -55,11 +69,14 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             visualMover.localPosition = offset * Vector3.forward;
         }
 
-        public override void Interact()
+        public override void InputUse(bool value, UdonInputEventArgs args)
         {
-            forwardDrive = !forwardDrive;
+            if (HandIsInRange(args.handType))
+            {
+                forwardDrive = !forwardDrive;
 
-            SetPosition();
+                SetPosition();
+            }
         }
     }
 }
