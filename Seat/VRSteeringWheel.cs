@@ -44,14 +44,10 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             initialLocalPosition = transform.localPosition;
             initialLocalRotation = transform.localRotation;
 
+            gameObject.SetActive(false);
+
             //if (highlightObject != null && highlightMaterial != null) defaultMaterial = highlightObject.material;
         }
-
-        private void Awake()
-        {
-            gameObject.SetActive(false);
-        }
-
 
         protected override void AdditionalLateUpdateFunctions()
         {
