@@ -24,7 +24,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         public bool ShowInteractionFeedback;
 
         bool isHeld = false;
-        bool indexUser = false;
+        bool viveUser = false;
         HandType currentHandNeverNone;
         bool tryPickupNextLateUpdate;
 
@@ -62,13 +62,13 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             //Index user detection
             string[] controllers = Input.GetJoystickNames();
 
-            indexUser = false;
+            viveUser = false;
 
             foreach (string controller in controllers)
             {
-                if (!controller.ToLower().Contains("index")) continue;
+                if (!controller.ToLower().Contains("vive")) continue;
 
-                indexUser = true;
+                viveUser = true;
                 break;
             }
         }
@@ -115,7 +115,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             }
 
             //Drop when letting go of grab
-            if (indexUser || !UsuallyHeldForLongerThanAFewSeconds)
+            if (!viveUser || !UsuallyHeldForLongerThanAFewSeconds)
             {
                 if (args.handType != currentHandNeverNone) return;
 
