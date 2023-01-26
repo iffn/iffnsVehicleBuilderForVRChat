@@ -59,6 +59,9 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         [UdonSynced(UdonSyncMode.None)] public readonly float[] steeringAngleDeg = new float[maxWheels / 2];
 
 
+        [UdonSynced(UdonSyncMode.None)] public bool limitedParameters = true;
+
+
         //Funcitons:
         //----------
         public bool EnableStationEntry
@@ -418,12 +421,17 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                     else
                     {
                         AvailableSeats[firstSeat].transform.localPosition = new Vector3(0, seatHeight, zPos);
+
+                        AvailableSeats[secondSeat].ForceExit();
                         AvailableSeats[secondSeat].gameObject.SetActive(false);
                     }
                 }
                 else
                 {
+                    AvailableSeats[firstSeat].ForceExit();
                     AvailableSeats[firstSeat].gameObject.SetActive(false);
+
+                    AvailableSeats[secondSeat].ForceExit();
                     AvailableSeats[secondSeat].gameObject.SetActive(false);
                 }
             }
@@ -503,7 +511,6 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                 wheelColliders: wheelColliders,
                 wheelMeshes: wheelMeshes);
         }
-
     }
 
     public enum PresetVehicleTypes

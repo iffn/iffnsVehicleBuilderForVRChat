@@ -2573,6 +2573,11 @@ MonoBehaviour:
   playerMover: {fileID: 1490822645970209563}
   positioningTime: 2
   Scaler: {fileID: 2079326318118328346}
+  VrInteractors:
+  - {fileID: 4604717067801057339}
+  VrPickups:
+  - {fileID: 3333501864301093233}
+  - {fileID: 3450450910426608432}
 --- !u!114 &8628138236498857881
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3079,9 +3084,9 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4888417780967293285}
-  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 0.04, z: 1}
+  m_LocalScale: {x: 1, y: 0.040000003, z: 1}
   m_Children:
   - {fileID: 3293119020967350191}
   - {fileID: 3750099062090249285}
@@ -3123,6 +3128,7 @@ MonoBehaviour:
   RightLineRenderer: {fileID: 4402921840787640686}
   UsuallyHeldForLongerThanAFewSeconds: 1
   ShowInteractionFeedback: 1
+  debugMode: 0
 --- !u!114 &690483112216189270
 MonoBehaviour:
   m_ObjectHideFlags: 0

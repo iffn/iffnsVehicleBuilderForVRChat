@@ -13,6 +13,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
     {
         //[SerializeField] Material highlightMaterial;
         //[SerializeField] MeshRenderer highlightObject;
+        [SerializeField] bool debugMode = false;
 
         Material defaultMaterial;
 
@@ -43,8 +44,6 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
             initialLocalPosition = transform.localPosition;
             initialLocalRotation = transform.localRotation;
-
-            gameObject.SetActive(false);
 
             //if (highlightObject != null && highlightMaterial != null) defaultMaterial = highlightObject.material;
         }
@@ -98,7 +97,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
         private void Update()
         {
-            DebugFunction();
+            if(debugMode) DebugFunction();
         }
 
         /*
@@ -119,8 +118,6 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
         protected override void PickupOccured()
         {
-            Debug.Log("Wheel pickup");
-
             initialAngle = GetHandAngle();
 
             //if (defaultMaterial != null) SetDefaultMaterial();
@@ -128,8 +125,6 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
         protected override void DropOccured()
         {
-            Debug.Log("Wheel drop");
-
             steeringAngle = 0;
             initialAngle = 0;
             ResetWheelPosition();

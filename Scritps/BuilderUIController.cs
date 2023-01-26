@@ -34,7 +34,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         [SerializeField] InputField[] SteeringAngleInputField;
 
         //[SerializeField] Button ClaimOwnershipButton;
-        [SerializeField] UnityEngine.UI.Text CurrentOwnerName;
+        [SerializeField] Text CurrentOwnerName;
 
         [SerializeField] GameObject[] OwnerObjects;
         [SerializeField] GameObject[] NonOwnerObjects;
@@ -48,7 +48,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
         bool editInProgress = false;
         bool skipUICalls = false;
-        bool seriousMode = true;
+        bool limitedParameters = true;
 
         private void Update()
         {
@@ -155,6 +155,10 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                 }
             }
 
+            //Update sync parameter
+            linkedVehicleBuilder.limitedParameters = limitedParameters;
+
+            //Update vehicle builder and sync if owner
             linkedVehicleBuilder.BuildVehicleBasedOnBuildParameters();
 
             ToggleArrayElementsDependingOnInputs();
@@ -164,6 +168,27 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
         public void UpdateUIFromVehicle()
         {
+            //Sync serious mode
+            if (!Networking.IsOwner(linkedVehicleBuilder.gameObject))
+            {
+                if(limitedParameters != linkedVehicleBuilder.limitedParameters)
+                {
+                    limitedParameters = linkedVehicleBuilder.limitedParameters;
+
+                    skipUICalls = true;
+
+                    foreach (FloatInputLineController input in floatInputs)
+                    {
+                        input.ApplyLimits = limitedParameters;
+                    }
+
+                    SeriousModeToggle.isOn = limitedParameters;
+
+                    skipUICalls = false;
+                }
+                
+            }
+
             skipUICalls = true;
 
             //Vehicle
@@ -226,6 +251,8 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
         public void SetVehicleOwnerDisplay(VRCPlayerApi owner)
         {
+            Debug.Log("Transfering owner to me = " + owner.isLocal);
+
             bool locallyOwned = owner.isLocal;
 
             foreach(GameObject o in OwnerObjects)
@@ -254,18 +281,18 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             this.linkedVehicle = linkedVehicle;
             linkedVehicleBuilder = linkedVehicle.LinkedVehicleBuilder;
 
-            seriousMode = SeriousModeToggle.isOn;
+            limitedParameters = SeriousModeToggle.isOn;
 
-            MassInput.Setup(this, 800, 6000, 1000, seriousMode);
-            WidthWithWheelsInput.Setup(this, 1, 4, 3, seriousMode);
-            LengthInput.Setup(this, 1, 6, 4, seriousMode);
-            GroundClearanceInput.Setup(this, 0.05f, 1f, 0.2f, seriousMode);
-            SeatLengthRatioInput.Setup(this, 0.05f, 1f, 0.8f, seriousMode);
-            SeatWidthRatioInput.Setup(this, 0.05f, 1f, 0.8f, seriousMode);
-            WheelRadiusInput.Setup(this, 0.1f, 1f, 0.5f, seriousMode);
-            WheelWidthInput.Setup(this, 0.1f, 1, 0.2f, seriousMode);
-            MotorTorqueInput.Setup(this, 100, 3000, 400, seriousMode);
-            BreakTorqueInput.Setup(this, 100, 3000, 500, seriousMode);
+            MassInput.Setup(this, 800, 6000, 1000, limitedParameters);
+            WidthWithWheelsInput.Setup(this, 1, 4, 3, limitedParameters);
+            LengthInput.Setup(this, 1, 6, 4, limitedParameters);
+            GroundClearanceInput.Setup(this, 0.05f, 1f, 0.2f, limitedParameters);
+            SeatLengthRatioInput.Setup(this, 0.05f, 1f, 0.8f, limitedParameters);
+            SeatWidthRatioInput.Setup(this, 0.05f, 1f, 0.8f, limitedParameters);
+            WheelRadiusInput.Setup(this, 0.1f, 1f, 0.5f, limitedParameters);
+            WheelWidthInput.Setup(this, 0.1f, 1, 0.2f, limitedParameters);
+            MotorTorqueInput.Setup(this, 100, 1000, 400, limitedParameters);
+            BreakTorqueInput.Setup(this, 100, 1200, 500, limitedParameters);
 
             floatInputs = new FloatInputLineController[] {
                 MassInput,
@@ -281,6 +308,12 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             };
 
             SetVehicleOwnerDisplay(Networking.GetOwner(this.linkedVehicle.LinkedVehicleSync.gameObject));
+
+            limitedParameters = linkedVehicleBuilder.limitedParameters;
+
+            skipUICalls = true;
+            SeriousModeToggle.isOn = limitedParameters;
+            skipUICalls = false;
         }
 
         void Start()
@@ -290,14 +323,14 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
         public void SeriousModeUpdate()
         {
-            seriousMode = SeriousModeToggle.isOn;
+            limitedParameters = SeriousModeToggle.isOn;
 
             foreach(FloatInputLineController input in floatInputs)
             {
-                input.ApplyLimits = seriousMode;
+                input.ApplyLimits = limitedParameters;
             }
 
-            if(seriousMode) UpdateVehicleFromUI();
+            UpdateVehicleFromUI(); //Always update vehicle to trigger sync
         }
 
         public void SetVehiclePreset(PresetVehicleTypes types)

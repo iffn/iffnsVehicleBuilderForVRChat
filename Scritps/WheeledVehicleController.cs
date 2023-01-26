@@ -15,6 +15,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         //Inspector values:
         [Header("Settings")]
         [SerializeField] float maxSteeringAnlgeDeg = 45;
+        [SerializeField] bool debugMode = false;
 
         [Header("Unity assingments")]
         [SerializeField] WheeledVehicleBuilder linkedVehicleBuilder;
@@ -132,15 +133,6 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
             beingDrivenLocally = true;
 
-            if (Networking.LocalPlayer.IsUserInVR())
-            {
-                Debug.Log("Entering Seat in VR and enabling VR steering wheel");
-
-                LinkedVRSteeringWheel.gameObject.SetActive(true);
-                LinkedVRBreakHolder.gameObject.SetActive(true);
-                
-            }
-
             LinkedDriveDirectionInteractor.ColliderState = true;
 
             LinkedMapDisplay.gameObject.SetActive(true);
@@ -149,17 +141,6 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         public void ExitedDriverSeat()
         {
             BeingDrivenLocally = false;
-
-            if (Networking.LocalPlayer.IsUserInVR())
-            {
-                Debug.Log("Exiting Seat in VR and disabling VR steering wheel");
-
-                LinkedVRSteeringWheel.ForceDropIfHeld();
-                LinkedVRBreakHolder.ForceDropIfHeld();
-
-                LinkedVRSteeringWheel.gameObject.SetActive(false);
-                LinkedVRBreakHolder.gameObject.SetActive(false);
-            }
 
             LinkedDriveDirectionInteractor.ColliderState = false;
 
@@ -383,7 +364,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             LinkedVRSteeringWheel.Setup(maxSteeringAnlgeDeg);
             LinkedMapDisplay.gameObject.SetActive(false);
 
-            LinkedVRBreakHolder.gameObject.SetActive(false);
+            LinkedVRBreakHolder.gameObject.SetActive(Networking.LocalPlayer.IsUserInVR());
 
             //Setup builder
 
@@ -461,7 +442,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
         private void Update()
         {
-            DebugFunction();
+            if(debugMode) DebugFunction();
 
             if (linkedVehicleSync.VehicleIsOwned)
             {

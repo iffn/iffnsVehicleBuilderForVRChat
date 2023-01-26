@@ -160,7 +160,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
         public void ForceDropIfHeld()
         {
-            drop();
+            if(IsHeld) drop();
         }
 
         void pickup()

@@ -8,6 +8,8 @@ using VRC.Udon;
 public class WheeledVehicleSeatController : SeatController
 {
     [SerializeField] Transform Scaler;
+    [SerializeField] CockpitBaseTrigger[] VrInteractors;
+    [SerializeField] CockpitPickup[] VrPickups;
 
     WheeledVehicleController linkedVehicle;
     VRCStation linkedVRCStaion;
@@ -20,6 +22,8 @@ public class WheeledVehicleSeatController : SeatController
         linkedVRCStaion.disableStationExit = true;
 
         linkedVRCStaion.canUseStationFromStation = false; //Set in script since prefab values don't get saved
+
+        SetVrEnableState(false);
     }
 
     protected override void UpdateFunction()
@@ -32,6 +36,25 @@ public class WheeledVehicleSeatController : SeatController
             {
                 linkedVRCStaion.ExitStation(Networking.LocalPlayer);
             }
+        }
+    }
+
+    void SetVrEnableState(bool value)
+    {
+        foreach(CockpitBaseTrigger interactor in VrInteractors)
+        {
+            interactor.enabled = value;
+        }
+
+
+        foreach (CockpitPickup pickup in VrPickups)
+        {
+            if (!value)
+            {
+                pickup.ForceDropIfHeld();
+            }
+
+            pickup.enabled = value;
         }
     }
 
@@ -107,6 +130,8 @@ public class WheeledVehicleSeatController : SeatController
         }
 
         ScaleWheel(player);
+
+        if(Networking.LocalPlayer.IsUserInVR()) SetVrEnableState(true);
     }
 
     public override void OnStationExited(VRCPlayerApi player)
@@ -114,5 +139,7 @@ public class WheeledVehicleSeatController : SeatController
         base.OnStationExited(player);
 
         linkedVehicle.ExitedDriverSeat();
+
+        if (Networking.LocalPlayer.IsUserInVR()) SetVrEnableState(false);
     }
 }

@@ -65,6 +65,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         WheeledVehicleController linkedVehicle;
         Transform linkedVehicleTransform;
 
+        bool isCurrentOwner = false;
         float heading = 0;
         float previousHeading = 0;
 
@@ -81,6 +82,8 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             enabled = true;
             this.linkedVehicle = linkedVehicle;
             linkedVehicleTransform = this.linkedVehicle.transform;
+
+            isCurrentOwner = Networking.LocalPlayer.IsOwner(gameObject);
         }
 
         public float GetCaluclatedTurnRateIfSynced
@@ -117,6 +120,11 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         private void Update()
         {
             //Update controlled by vehicle controller
+
+            if(Input.GetKeyDown(KeyCode.Home))
+            {
+                Debug.Log($"Sync owner = {Networking.GetOwner(gameObject).playerId}, {nameof(isCurrentOwner)} value = {isCurrentOwner}");
+            }
         }
 
         public override void OnDeserialization()
@@ -129,13 +137,27 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             Networking.SetOwner(Networking.LocalPlayer, gameObject);
         }
 
+        public override void OnPlayerLeft(VRCPlayerApi player)
+        {
+            if (Networking.LocalPlayer.IsOwner(gameObject) && !isCurrentOwner)
+            {
+                Debug.Log("If you see this message, VRChat has not fixed OnOwnershipTransferred on owner leave yet ");
+                OnOwnershipTransferred(Networking.LocalPlayer);
+            }
+        }
+
         public override void OnOwnershipTransferred(VRCPlayerApi player)
         {
-            Debug.LogWarning("Ownership transfered to " + player.playerId + ":" + player.displayName);
+            isCurrentOwner = player.isLocal;
+
+            Debug.Log("--->>> OWNERSHIP TRANSFERED <<<----");
 
             linkedVehicle.UpdateParametersBasedOnOwnership();
 
             linkedVehicle.LinkedUI.SetVehicleOwnerDisplay(player);
+
+            if (!Networking.LocalPlayer.IsOwner(linkedVehicle.LinkedVehicleBuilder.gameObject))
+                Networking.SetOwner(Networking.LocalPlayer, linkedVehicle.LinkedVehicleBuilder.gameObject);
 
             if (!player.isLocal)
             {

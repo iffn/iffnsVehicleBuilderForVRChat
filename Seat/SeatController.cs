@@ -168,13 +168,11 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         {
             seatedPlayer = null;
 
-            if (!player.isLocal) return;
             attacheCollider.enabled = true;
 
             playerMover.localPosition = Vector3.zero;
 
             entryTime = Mathf.NegativeInfinity;
-
         }
     }
 
