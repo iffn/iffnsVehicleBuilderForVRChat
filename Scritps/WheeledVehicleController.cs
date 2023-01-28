@@ -9,6 +9,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 {
     [RequireComponent(typeof(Rigidbody))]
     [RequireComponent(typeof(BoxCollider))]
+    [RequireComponent(typeof(WheeledVehicleSync))]
     [UdonBehaviourSyncMode(BehaviourSyncMode.Continuous)]
     public class WheeledVehicleController : UdonSharpBehaviour
     {
@@ -56,6 +57,10 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         public float turnRateDebug;
         public float assumedSteeringInputDebug;
 
+
+        Vector3 originalLocalPosition;
+        Quaternion originalLocalRotation;
+
         bool vehicleFixed = false;
         public bool VehicleFixed
         {
@@ -90,8 +95,24 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             }
         }
 
-        Vector3 originalLocalPosition;
-        Quaternion originalLocalRotation;
+        bool beingDrivenLocally = false;
+        public bool BeingDrivenLocally
+        {
+            get
+            {
+                return beingDrivenLocally;
+            }
+            set
+            {
+                beingDrivenLocally = value;
+
+                if (!value)
+                {
+                    ResetInputs();
+                }
+            }
+        }
+
 
         public void RespawnVehicle()
         {
@@ -121,12 +142,12 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         public void UpdateParametersBasedOnOwnership()
         {
             //SetRigidbodyActiveBasedOnParameters
-            LinkedRigidbody.isKinematic = !linkedVehicleSync.VehicleIsOwned;
+            LinkedRigidbody.isKinematic = !linkedVehicleSync.LocallyOwned;
         }
 
         public void EnteredDriverSeat()
         {
-            if (!linkedVehicleSync.VehicleIsOwned)
+            if (!linkedVehicleSync.LocallyOwned)
             {
                 MakeLocalPlayerOwner();
             }
@@ -147,23 +168,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             LinkedMapDisplay.gameObject.SetActive(false);
         }
 
-        bool beingDrivenLocally = false;
-        public bool BeingDrivenLocally
-        {
-            get
-            {
-                return beingDrivenLocally;
-            }
-            set
-            {
-                beingDrivenLocally = value;
-
-                if (!value)
-                {
-                    ResetInputs();
-                }
-            }
-        }
+        
 
         public float[] GetWheelColliderHeight()
         {
@@ -411,7 +416,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             {
                 int symetricArrayIndex = i / 2;
 
-                float steerAngle = -steeringAngleDeg[symetricArrayIndex] * assumedSteeringInput;
+                float steerAngle = steeringAngleDeg[symetricArrayIndex] * assumedSteeringInput;
 
                 //wheelMeshes[i].rotation = transform.rotation * Quaternion.Euler(new Vector3(assumedWheelRotation, steerAngle, 0));
                 wheelMeshes[i].rotation = transform.rotation * Quaternion.Euler(new Vector3(0, steerAngle, 0));
@@ -444,7 +449,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         {
             if(debugMode) DebugFunction();
 
-            if (linkedVehicleSync.VehicleIsOwned)
+            if (linkedVehicleSync.LocallyOwned)
             {
                 if (BeingDrivenLocally)
                 {
@@ -456,13 +461,9 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                 UpdateWheelMeshPositionWhenOwner();
 
                 Drive();
-
-                linkedVehicleSync.SyncLocationFromMe();
             }
             else
             {
-                linkedVehicleSync.SyncLocationPositionToMe();
-
                 //linkedVehicleSync.updateArrayFromSync();
 
                 UpdateWheelMeshPositionWhenNotOwned();
@@ -473,7 +474,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         {
             Debug.LogWarning("Trying to claim  ownership");
 
-            if (linkedVehicleSync.VehicleIsOwned)
+            if (linkedVehicleSync.LocallyOwned)
             {
                 Debug.LogWarning("   Already the vehicle owner");
                 return;

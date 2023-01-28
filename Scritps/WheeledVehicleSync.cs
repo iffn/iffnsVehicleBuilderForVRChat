@@ -1,16 +1,15 @@
 ﻿using UdonSharp;
 using UnityEngine;
+using VRC.SDK3.Components;
 using VRC.SDKBase;
 using VRC.Udon;
 
 namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 {
     [UdonBehaviourSyncMode(BehaviourSyncMode.Continuous)]
+    [RequireComponent(typeof(VRCObjectSync))]
     public class WheeledVehicleSync : UdonSharpBehaviour
     {
-        [UdonSynced(UdonSyncMode.Smooth)] Vector3 Position;
-        [UdonSynced(UdonSyncMode.Smooth)] Quaternion Rotation;
-
         
         ///*[UdonSynced(UdonSyncMode.Smooth)]*/ public float[] verticalWheelPositions = new float[WheeledVehicleBuilder.maxWheels];
 
@@ -63,17 +62,18 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
 
         WheeledVehicleController linkedVehicle;
-        Transform linkedVehicleTransform;
 
-        bool isCurrentOwner = false;
+        bool locallyOwned = false;
         float heading = 0;
         float previousHeading = 0;
 
-        public bool VehicleIsOwned
+        public bool LocallyOwned
         {
             get
             {
-                return Networking.IsOwner(gameObject);
+                return locallyOwned;
+
+                //return Networking.IsOwner(gameObject);
             }
         }
 
@@ -81,9 +81,8 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         {
             enabled = true;
             this.linkedVehicle = linkedVehicle;
-            linkedVehicleTransform = this.linkedVehicle.transform;
 
-            isCurrentOwner = Networking.LocalPlayer.IsOwner(gameObject);
+            locallyOwned = Networking.LocalPlayer.IsOwner(gameObject);
         }
 
         public float GetCaluclatedTurnRateIfSynced
@@ -99,22 +98,9 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             }
         }
 
-        void calculateHeading()
+        void CalculateHeading()
         {
             heading = Mathf.Atan2(transform.forward.z, transform.forward.x);
-        }
-
-        public void SyncLocationFromMe()
-        {
-            Position = linkedVehicleTransform.position;
-            Rotation = linkedVehicleTransform.rotation;
-
-            //verticalWheelPositions = linkedVehicle.GetWheelColliderHeight();
-        }
-
-        public void SyncLocationPositionToMe()
-        {
-            linkedVehicleTransform.SetPositionAndRotation(Position, Rotation);
         }
 
         private void Update()
@@ -123,7 +109,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
             if(Input.GetKeyDown(KeyCode.Home))
             {
-                Debug.Log($"Sync owner = {Networking.GetOwner(gameObject).playerId}, {nameof(isCurrentOwner)} value = {isCurrentOwner}");
+                Debug.Log($"Sync owner = {Networking.GetOwner(gameObject).playerId}, {nameof(locallyOwned)} value = {locallyOwned}");
             }
         }
 
@@ -139,7 +125,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
         public override void OnPlayerLeft(VRCPlayerApi player)
         {
-            if (Networking.LocalPlayer.IsOwner(gameObject) && !isCurrentOwner)
+            if (Networking.LocalPlayer.IsOwner(gameObject) && !locallyOwned)
             {
                 Debug.Log("If you see this message, VRChat has not fixed OnOwnershipTransferred on owner leave yet ");
                 OnOwnershipTransferred(Networking.LocalPlayer);
@@ -148,21 +134,23 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
         public override void OnOwnershipTransferred(VRCPlayerApi player)
         {
-            isCurrentOwner = player.isLocal;
+            locallyOwned = player.isLocal;
 
-            Debug.Log("--->>> OWNERSHIP TRANSFERED <<<----");
-
+            //Inform vehicle controller
             linkedVehicle.UpdateParametersBasedOnOwnership();
 
+            //Inform UI
             linkedVehicle.LinkedUI.SetVehicleOwnerDisplay(player);
 
+            //Ensure ownership of builder
             if (!Networking.LocalPlayer.IsOwner(linkedVehicle.LinkedVehicleBuilder.gameObject))
                 Networking.SetOwner(Networking.LocalPlayer, linkedVehicle.LinkedVehicleBuilder.gameObject);
+
 
             if (!player.isLocal)
             {
                 //Reset heading values
-                calculateHeading();
+                CalculateHeading();
                 previousHeading = heading;
             }
         }
