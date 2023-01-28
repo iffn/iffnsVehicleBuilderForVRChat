@@ -239,8 +239,6 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
         public void SetVehicleOwnerDisplay(VRCPlayerApi owner)
         {
-            Debug.Log("Transfering owner to me = " + owner.isLocal);
-
             bool locallyOwned = owner.isLocal;
 
             foreach(GameObject o in OwnerObjects)

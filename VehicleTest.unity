@@ -2777,12 +2777,6 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 1028912077}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &440626725 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7219213577104748122, guid: 422326f2282676c41a1834f46e2e9a9d,
-    type: 3}
-  m_PrefabInstance: {fileID: 1028912077}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &444946067
 GameObject:
   m_ObjectHideFlags: 0
@@ -3550,6 +3544,12 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 6428585475613277030, guid: 422326f2282676c41a1834f46e2e9a9d,
         type: 3}
+    - target: {fileID: 6457716091505037641, guid: 422326f2282676c41a1834f46e2e9a9d,
+        type: 3}
+      propertyPath: serializationData.Prefab
+      value: 
+      objectReference: {fileID: 6457716091505037641, guid: 422326f2282676c41a1834f46e2e9a9d,
+        type: 3}
     - target: {fileID: 6560849154409415240, guid: 422326f2282676c41a1834f46e2e9a9d,
         type: 3}
       propertyPath: serializationData.Prefab
@@ -4248,7 +4248,7 @@ PrefabInstance:
         type: 3}
       propertyPath: NetworkIDs.Array.data[35].gameObject
       value: 
-      objectReference: {fileID: 440626725}
+      objectReference: {fileID: 0}
     - target: {fileID: 6759095419728963412, guid: 8894fa7e4588a5c4fab98453e558847d,
         type: 3}
       propertyPath: NetworkIDs.Array.data[36].gameObject

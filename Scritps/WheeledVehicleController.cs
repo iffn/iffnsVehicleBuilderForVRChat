@@ -213,6 +213,10 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                 {
                     wheelColliders[i].motorTorque = motorTorquePerDrivenWheel * driveInput;
                 }
+                else
+                {
+                    wheelColliders[i].motorTorque = Mathf.Sign(driveInput); //2 wheel drive Somehow breaks without this
+                }
 
                 wheelColliders[i].steerAngle = steeringAngleDeg[symetricArrayIndex] * steeringInput;
 
@@ -432,6 +436,8 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                 Debug.Log($"Class {nameof(WheeledVehicleController)} of GameObject {gameObject.name} worked at {Time.time}");
 
                 Debug.Log($"{nameof(LinkedDriveDirectionInteractor)} collider activation = {LinkedDriveDirectionInteractor.ColliderState}");
+
+                Debug.Log($"First wheel active = {drivenWheels[0]}");
 
                 debugActive = true;
             }
