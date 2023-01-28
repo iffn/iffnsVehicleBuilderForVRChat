@@ -57,9 +57,8 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         public float turnRateDebug;
         public float assumedSteeringInputDebug;
 
-
-        Vector3 originalLocalPosition;
-        Quaternion originalLocalRotation;
+        Vector3 spawnLocalPosition;
+        Quaternion spawnLocalRotation;
 
         bool vehicleFixed = false;
         public bool VehicleFixed
@@ -113,14 +112,13 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             }
         }
 
-
         public void RespawnVehicle()
         {
             LinkedRigidbody.velocity = Vector3.zero;
             LinkedRigidbody.angularVelocity = Vector3.zero;
 
-            transform.localPosition = originalLocalPosition;
-            transform.localRotation = originalLocalRotation;
+            transform.localPosition = spawnLocalPosition;
+            transform.localRotation = spawnLocalRotation;
         }
 
         public WheeledVehicleBuilder LinkedVehicleBuilder
@@ -167,8 +165,6 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
             LinkedMapDisplay.gameObject.SetActive(false);
         }
-
-        
 
         public float[] GetWheelColliderHeight()
         {
@@ -377,8 +373,8 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
             UpdateParametersBasedOnOwnership();
 
-            originalLocalPosition = transform.localPosition;
-            originalLocalRotation = transform.localRotation;
+            spawnLocalPosition = transform.localPosition;
+            spawnLocalRotation = transform.localRotation;
         }
 
         void UpdateWheelMeshPositionWhenOwner()

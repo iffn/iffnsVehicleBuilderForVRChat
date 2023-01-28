@@ -46,14 +46,8 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
         FloatInputLineController[] floatInputs;
 
-        bool editInProgress = false;
-        bool skipUICalls = false;
+        bool skipUICalls = false; //Unable to disable function calls when updating UI fields. Therefore using flag to check for skipping
         bool limitedParameters = true;
-
-        private void Update()
-        {
-
-        }
 
         public void RespawnVehicle()
         {
@@ -67,25 +61,20 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
         public void UpdateVehicleFromUI()
         {
+            //Check if skipping UI calls
             if (skipUICalls) return;
 
-            if (editInProgress)
-            {
-                Debug.LogWarning("Edit in progress");
-                return;
-            }
-
-            editInProgress = true;
-
+            //Check if not the owner:
             if (!Networking.IsOwner(linkedVehicleBuilder.gameObject))
             {
-                Debug.LogWarning("UpdateVehicleFromUI for non owner");
-
+                //if not the owner:
                 UpdateUIFromVehicle();
-                editInProgress = false;
                 return;
             }
 
+            skipUICalls = true;
+
+            //Setup variables for parsing:
             float currentFloat;
             int currentInt;
             float x, y, z;
@@ -163,7 +152,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
             ToggleArrayElementsDependingOnInputs();
 
-            editInProgress = false;
+            skipUICalls = false;
         }
 
         public void UpdateUIFromVehicle()
@@ -194,7 +183,6 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             //Vehicle
             MassInput.Value = linkedVehicleBuilder.mass;
             WidthWithWheelsInput.Value = linkedVehicleBuilder.widthWithWheels;
-            //widthWithWheelsInputField.text = linkedVehicleBuilder.widthWithWheels.ToString();
             LengthInput.Value = linkedVehicleBuilder.length;
             GroundClearanceInput.Value = linkedVehicleBuilder.groundClearance;
             CenterOfMassXYZInputFields[0].text = linkedVehicleBuilder.centerOfMassPositionRelativeToCenterBottom.x.ToString();

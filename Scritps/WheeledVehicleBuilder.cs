@@ -58,7 +58,6 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         [UdonSynced(UdonSyncMode.None)] public float breakTorquePerWheel;
         [UdonSynced(UdonSyncMode.None)] public readonly float[] steeringAngleDeg = new float[maxWheels / 2];
 
-
         [UdonSynced(UdonSyncMode.None)] public bool limitedParameters = true;
 
 
@@ -187,38 +186,8 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             SetBuildParameters(initialVehicleType);
         }
 
-        bool usesValidBuildParameters()
-        {
-            //Verify wheel cound
-            if (numberOfWheels % 2 != 0)
-            {
-                return false;
-                
-            }
-
-            if (numberOfWheels < minWheels)
-            {
-                return false;
-            }
-
-            //Check if numbers positive
-            if (wheelRadius < 0)
-            {
-                return false;
-            }
-
-            if (breakTorquePerWheel < 0)
-            {
-                return false;
-            }
-
-            return true;
-        }
-
         public override void OnDeserialization()
         {
-            Debug.LogWarning("Receiving build parameters");
-
             BuildFromParameters();
         }
 
@@ -227,28 +196,6 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             BuildVehicleBasedOnBuildParameters();
 
             linkedController.LinkedUI.UpdateUIFromVehicle();
-        }
-
-        public void DelayedBuild()
-        {
-            if (usesValidBuildParameters())
-            {
-                Debug.LogWarning("Parameters useful, building vehicle");
-
-
-                BuildVehicleBasedOnBuildParameters();
-
-                Debug.LogWarning("Updating UI");
-
-                linkedController.LinkedUI.UpdateUIFromVehicle();
-
-                Debug.LogWarning("Deserialization complete");
-            }
-            else
-            {
-                Debug.LogWarning("Parameters not useful! Sending delayed event");
-                SendCustomEventDelayedFrames(nameof(DelayedBuild), 0);
-            }
         }
         
         void BuildBody()
@@ -269,7 +216,8 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                 Destroy(BodyMeshes[i]);
             }
 
-            int numberOfMeshes = numberOfWheels + numberOfWheels - 2 + 1 + 3 + 3; //Wheel openings, between wheels, center, front, back
+            //                   Wheel openings,   between wheels, center, front, back
+            int numberOfMeshes = numberOfWheels + (numberOfWheels - 2) + 1 + 3 + 3; 
 
             BodyMeshes = new GameObject[numberOfMeshes];
 
@@ -320,12 +268,6 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             BodyMeshes[currentMeshCount++] = floor;
             floor.transform.localPosition = Vector3.zero;
             floor.transform.localScale = new Vector3(widthWithWheels * 0.5f - wheelWidth, length, wheelRadius * 2);
-
-            /*
-            floor = Instantiate(floor, transform);
-            BodyMeshes[currentMeshCount++] = floor;
-            floor.transform.localScale = new Vector3(-floor.transform.localScale.x, floor.transform.localScale.y, floor.transform.localScale.z);
-            */
 
             //Front and back middle:
             GameObject frontMiddle = Instantiate(CenterFrontTemplate, BodyHolder);
