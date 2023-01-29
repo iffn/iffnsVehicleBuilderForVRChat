@@ -439,6 +439,9 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
                 Debug.Log($"First wheel active = {drivenWheels[0]}");
 
+                Debug.Log($"Owner of sync controller = {Networking.GetOwner(LinkedVehicleSync.gameObject).playerId}");
+                Debug.Log($"Owner of builder controller = {Networking.GetOwner(LinkedVehicleBuilder.gameObject).playerId}");
+
                 debugActive = true;
             }
             else
@@ -449,7 +452,10 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
         private void Update()
         {
-            if(debugMode) DebugFunction();
+            if (debugMode)
+            {
+                DebugFunction();
+            }
 
             if (linkedVehicleSync.LocallyOwned)
             {
@@ -474,20 +480,11 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
         public void ClaimOwnership()
         {
-            Debug.LogWarning("Trying to claim  ownership");
-
-            if (linkedVehicleSync.LocallyOwned)
-            {
-                Debug.LogWarning("   Already the vehicle owner");
-                return;
-            }
             if (linkedDriverStation.StationOccupant == StationOccupantTypes.someoneElse)
             {
-                Debug.LogWarning("   Someone else is sitting in the vehicle");
+                Debug.Log("Someone else is occupying the station");
                 return;
             }
-
-            Debug.LogWarning("   Making the local player the owner");
 
             MakeLocalPlayerOwner();
 
@@ -499,9 +496,15 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
         void MakeLocalPlayerOwner()
         {
-            linkedVehicleSync.MakeLocalPlayerOwner();
+            //Warning: Changing the order breaks the ownership transfer
+            LinkedVehicleSync.MakeLocalPlayerOwner();
             linkedVehicleBuilder.MakeLocalPlayerOwner();
+        }
 
+        public void DelayedOwnershipClaim()
+        {
+            linkedVehicleBuilder.MakeLocalPlayerOwner();
+            LinkedVehicleSync.MakeLocalPlayerOwner();
         }
 
         //index right hand joystck

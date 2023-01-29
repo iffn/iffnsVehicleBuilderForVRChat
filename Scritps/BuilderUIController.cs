@@ -257,6 +257,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             CurrentOwnerName.text = owner.playerId + ": " + owner.displayName;
         }
 
+        //UI Button
         public void ClaimOwnership()
         {
             linkedVehicle.ClaimOwnership();

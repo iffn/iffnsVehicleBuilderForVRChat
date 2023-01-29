@@ -60,7 +60,6 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         }
         */
 
-
         WheeledVehicleController linkedVehicle;
 
         bool locallyOwned = false;
@@ -120,6 +119,8 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
         public void MakeLocalPlayerOwner()
         {
+            if (Networking.IsOwner(gameObject)) return;
+
             Networking.SetOwner(Networking.LocalPlayer, gameObject);
         }
 
@@ -143,9 +144,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             linkedVehicle.LinkedUI.SetVehicleOwnerDisplay(player);
 
             //Ensure ownership of builder
-            if (!Networking.LocalPlayer.IsOwner(linkedVehicle.LinkedVehicleBuilder.gameObject))
-                Networking.SetOwner(Networking.LocalPlayer, linkedVehicle.LinkedVehicleBuilder.gameObject);
-
+            linkedVehicle.LinkedVehicleBuilder.MakeLocalPlayerOwner();
 
             if (!player.isLocal)
             {

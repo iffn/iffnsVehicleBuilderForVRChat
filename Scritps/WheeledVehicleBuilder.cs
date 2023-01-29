@@ -83,6 +83,11 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
         public void MakeLocalPlayerOwner()
         {
+            if (Networking.IsOwner(gameObject)) return;
+            //if (Networking.GetOwner(gameObject).isLocal) return;
+
+            Debug.Log("Setting local player to owner of " + nameof(WheeledVehicleBuilder));
+
             Networking.SetOwner(Networking.LocalPlayer, gameObject);
         }
 
