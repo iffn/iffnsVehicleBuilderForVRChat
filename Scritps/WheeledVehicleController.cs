@@ -249,6 +249,14 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                 LinkedRigidbody.constraints = RigidbodyConstraints.None;
             }
 
+            if (!Networking.LocalPlayer.IsUserInVR())
+            {
+                driveInput += Input.GetAxis("Vertical");
+                steeringInput -= Input.GetAxis("Horizontal");
+            }
+
+            
+            /*
             if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
             {
                 driveInput++;
@@ -266,6 +274,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             {
                 steeringInput--;
             }
+            */
 
             if (Input.GetKey(KeyCode.Space))
             {
