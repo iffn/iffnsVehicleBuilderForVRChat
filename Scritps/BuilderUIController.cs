@@ -8,7 +8,14 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 {
     public class BuilderUIController : UdonSharpBehaviour
     {
-        
+        /*
+            Tasks of this component:
+            - Display parameters to the user
+            - Allow editing of parameters
+            - Limit parameters
+            - Provide user interface for ownership changes
+        */
+
         [Header("Unity assingments")]
         WheeledVehicleBuilder linkedVehicleBuilder;
         WheeledVehicleController linkedVehicle;

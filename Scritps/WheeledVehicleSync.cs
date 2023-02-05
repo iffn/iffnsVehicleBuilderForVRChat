@@ -10,7 +10,13 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
     [RequireComponent(typeof(VRCObjectSync))]
     public class WheeledVehicleSync : UdonSharpBehaviour
     {
-        
+        /*
+            Tasks of this component:
+            - Manage ownership
+            - Ensure position and rotation sync
+            - Provide derivatives for component sync
+        */
+
         ///*[UdonSynced(UdonSyncMode.Smooth)]*/ public float[] verticalWheelPositions = new float[WheeledVehicleBuilder.maxWheels];
 
         /*

@@ -9,6 +9,13 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
     [RequireComponent(typeof(VRCStation))]
     public class SeatController : UdonSharpBehaviour
     {
+        /*
+            Tasks of this component:
+            - Detect station entry and exit
+            - Track player in station
+            - Position player correctly
+        */
+
         [SerializeField] protected PlayerTrackingTypes playerTrackingType;
         [SerializeField] protected Transform targetHeadPosition;
         [SerializeField] protected Transform targetHipPosition;

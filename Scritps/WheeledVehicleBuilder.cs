@@ -8,6 +8,13 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
     [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
     public class WheeledVehicleBuilder : UdonSharpBehaviour
     {
+        /*
+            Tasks of this component:
+            - Sync build parameters
+            - Organize presets
+            - Apply build parameters to model
+        */
+
         //Parameters to be set in Unity
         [SerializeField] WheelCollider WheelPrefab;
         [SerializeField] SeatController[] AvailableSeats;
@@ -117,8 +124,8 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                     numberOfWheels = 6;
                     wheelRadius = 0.5f;
                     wheelWidth = 0.4f;
-                    motorTorquePerDrivenWheel = 200;
-                    breakTorquePerWheel = 500;
+                    motorTorquePerDrivenWheel = 350;
+                    breakTorquePerWheel = 750;
 
                     drivenWheelPairs[0] = true;
                     drivenWheelPairs[1] = true;

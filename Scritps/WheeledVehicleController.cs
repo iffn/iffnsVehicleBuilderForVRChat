@@ -13,6 +13,12 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
     [UdonBehaviourSyncMode(BehaviourSyncMode.Continuous)]
     public class WheeledVehicleController : UdonSharpBehaviour
     {
+        /*
+            Tasks of this component:
+            - Organize components
+            - Apply inputs to components
+        */
+
         //Inspector values:
         [Header("Settings")]
         [SerializeField] float maxSteeringAnlgeDeg = 45;
@@ -22,12 +28,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         [SerializeField] WheeledVehicleBuilder linkedVehicleBuilder;
         [SerializeField] WheeledVehicleSeatController linkedDriverStation;
         [SerializeField] WheeledVehicleSync linkedVehicleSync;
-        [SerializeField] DriveDirectionInteractor LinkedDriveDirectionInteractor;
-        [SerializeField] VRSteeringWheel LinkedVRSteeringWheel;
-        [SerializeField] VRBreakHolder LinkedVRBreakHolder;
-        [SerializeField] MapDisplay LinkedMapDisplay;
-        [SerializeField] Transform LinkedSteeringWheelVisualizer;
-        [SerializeField] TMPro.TextMeshProUGUI speedIndicator;
+        [SerializeField] CockpitController linkedCockpitController;
 
         public BuilderUIController LinkedUI; //For updating vehicle during sync;
 
@@ -152,18 +153,14 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
             beingDrivenLocally = true;
 
-            LinkedDriveDirectionInteractor.ColliderState = true;
-
-            LinkedMapDisplay.gameObject.SetActive(true);
+            linkedCockpitController.Active = true;
         }
 
         public void ExitedDriverSeat()
         {
             BeingDrivenLocally = false;
 
-            LinkedDriveDirectionInteractor.ColliderState = false;
-
-            LinkedMapDisplay.gameObject.SetActive(false);
+            linkedCockpitController.Active = false;
         }
 
         public float[] GetWheelColliderHeight()
@@ -231,131 +228,52 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             breakingInput = 1;
         }
 
-        void Control()
+        void UpdateAndGetControlsFromCockpit()
         {
-            driveInput = 0;
-            breakingInput = 0;
-            steeringInput = 0;
+            linkedCockpitController.UpdateComponent(LinkedRigidbody.velocity.magnitude);
 
-            if (Networking.LocalPlayer.IsUserInVR())
-            {
-                ApplyVRControls();
-            }
-
-            steeringInput = LinkedVRSteeringWheel.SteeringInput;
-
-            if (Input.GetKeyDown(KeyCode.Return))
-            {
-                LinkedRigidbody.constraints = RigidbodyConstraints.None;
-            }
-
-            if (!Networking.LocalPlayer.IsUserInVR())
-            {
-                driveInput += Input.GetAxis("Vertical");
-                steeringInput -= Input.GetAxis("Horizontal");
-            }
-
-            
-            /*
-            if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
-            {
-                driveInput++;
-            }
-            if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
-            {
-                driveInput--;
-            }
-
-            if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
-            {
-                steeringInput++;
-            }
-            if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
-            {
-                steeringInput--;
-            }
-            */
-
-            if (Input.GetKey(KeyCode.Space))
-            {
-                breakingInput = 1;
-            }
-
-            if(!Networking.LocalPlayer.IsUserInVR())
-            {
-                LinkedDriveDirectionInteractor.ForwardDrive = driveInput > 0;
-            }
-
-            LinkedSteeringWheelVisualizer.localRotation = Quaternion.Euler(0, 0, steeringInput * maxSteeringAnlgeDeg);
+            driveInput = linkedCockpitController.DriveInptut;
+            breakingInput = linkedCockpitController.BreakingInput;
+            steeringInput = linkedCockpitController.SteeringInptut;
         }
 
-        void ApplyVRControls()
+        public bool CheckAssignments()
         {
-            //Check hand: Return if not held, otherwise get drive and brake inputs
-            switch (LinkedVRSteeringWheel.currentPickupHand)
+            bool failed = false;
+
+            if (linkedVehicleBuilder == null)
             {
-                case VRC_Pickup.PickupHand.None:
-                    if(rightJoystickInput.magnitude > 0.3f)
-                    {
-                        linkedDriverStation.ForceExit();
-                    }
-                    return;
-                case VRC_Pickup.PickupHand.Left:
-                    driveInput = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger");
-                    if(leftJoystickInput.y > 0)
-                    {
-                        driveInput = Mathf.Clamp01(driveInput + leftJoystickInput.y);
-                    }
-                    else
-                    {
-                        breakingInput = Mathf.Clamp01(breakingInput - leftJoystickInput.y);
-                    }
-                    break;
-                case VRC_Pickup.PickupHand.Right:
-                    driveInput = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger");
-                    if (rightJoystickInput.y > 0)
-                    {
-                        driveInput = Mathf.Clamp01(driveInput + rightJoystickInput.y);
-                    }
-                    else
-                    {
-                        breakingInput = Mathf.Clamp01(breakingInput - rightJoystickInput.y);
-                    }
-                    break;
-                default:
-                    break;
+                Debug.LogWarning($"Error during setup of {gameObject.name}: {nameof(linkedVehicleBuilder)} not assigned");
+                failed = true;
+            }
+            if (linkedDriverStation == null)
+            {
+                Debug.LogWarning($"Error during setup of {gameObject.name}: {nameof(linkedDriverStation)} not assigned");
+                failed = true;
+            }
+            if (linkedCockpitController == null)
+            {
+                Debug.LogWarning($"Error during setup of {gameObject.name}: {nameof(linkedCockpitController)} not assigned");
+                failed = true;
+            }
+            if (linkedVehicleSync == null)
+            {
+                Debug.LogWarning($"Error during setup of {gameObject.name}: {nameof(linkedVehicleSync)} not assigned");
+                failed = true;
+            }
+            if (LinkedUI == null)
+            {
+                Debug.LogWarning($"Error during setup of {gameObject.name}: {nameof(LinkedUI)} not assigned");
+                failed = true;
             }
 
-            breakingInput = Mathf.Clamp01(breakingInput + LinkedVRBreakHolder.BreakInput);
-
-            if(!LinkedDriveDirectionInteractor.ForwardDrive)
-            {
-                driveInput *= -1;
-            }
+            return failed;
         }
 
         void Start()
         {
             //Error checks:
-            bool failed = false;
-
-            if (linkedVehicleBuilder == null)
-            {
-                Debug.LogWarning($"Error during setup of {{gameObject.name}}: {nameof(linkedVehicleBuilder)} not assigned");
-                failed = true;
-            }
-            if (linkedDriverStation == null) {
-                Debug.LogWarning($"Error during setup of {{gameObject.name}}: {nameof(linkedDriverStation)} not assigned"); 
-                failed = true;
-            }
-            if (linkedVehicleSync == null) {
-                Debug.LogWarning($"Error during setup of {{gameObject.name}}: {nameof(linkedVehicleSync)} not assigned"); 
-                failed = true;
-            }
-            if (LinkedUI == null) {
-                Debug.LogWarning($"Error during setup of {gameObject.name}: {nameof(LinkedUI)} not assigned"); 
-                failed = true;
-            }
+            bool failed = CheckAssignments();
 
             if (failed)
             {
@@ -364,6 +282,8 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             }
 
             //Setup
+
+            linkedCockpitController.Setup(false);
 
             LinkedRigidbody = transform.GetComponent<Rigidbody>();
 
@@ -375,10 +295,6 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             linkedVehicleSync.Setup(linkedVehicle: this);
             linkedVehicleBuilder.Setup(linkedController: this);
             LinkedUI.Setup(linkedVehicle: this);
-            LinkedVRSteeringWheel.Setup(maxSteeringAnlgeDeg);
-            LinkedMapDisplay.gameObject.SetActive(false);
-
-            LinkedVRBreakHolder.gameObject.SetActive(Networking.LocalPlayer.IsUserInVR());
 
             //Setup builder
 
@@ -444,8 +360,6 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                 //                                      V---Manually adjust this for each class ffs
                 Debug.Log($"Class {nameof(WheeledVehicleController)} of GameObject {gameObject.name} worked at {Time.time}");
 
-                Debug.Log($"{nameof(LinkedDriveDirectionInteractor)} collider activation = {LinkedDriveDirectionInteractor.ColliderState}");
-
                 Debug.Log($"First wheel active = {drivenWheels[0]}");
 
                 Debug.Log($"Owner of sync controller = {Networking.GetOwner(LinkedVehicleSync.gameObject).playerId}");
@@ -470,9 +384,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             {
                 if (BeingDrivenLocally)
                 {
-                    Control();
-
-                    speedIndicator.text = LinkedRigidbody.velocity.magnitude.ToString("F2") + " m/s";
+                    UpdateAndGetControlsFromCockpit();
                 }
 
                 UpdateWheelMeshPositionWhenOwner();
