@@ -97,6 +97,8 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         {
             if (seatedPlayer == null || !seatedPlayer.isLocal) return;
 
+            Debug.Log("Force exit");
+
             attachedStation.ExitStation(Networking.LocalPlayer);
         }
 

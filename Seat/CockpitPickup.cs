@@ -53,7 +53,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             return GetTrackingHandFromControllerHand(currentHandNeverNone);
         }
 
-        protected override void Setup()
+        public override void Setup()
         {
             base.Setup();
 

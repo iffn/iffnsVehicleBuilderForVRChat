@@ -33,7 +33,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             }
         }
 
-        protected virtual void Setup()
+        public virtual void Setup()
         {
             validInteractionFeedback = LeftLineRenderer != null && RightLineRenderer != null;
         }

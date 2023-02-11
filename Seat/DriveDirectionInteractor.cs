@@ -45,11 +45,13 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             }
         }
 
-        private void Start()
+        public override void Setup()
         {
+            base.Setup();
+
             SetPosition();
 
-            attachedCollider= GetComponent<Collider>();
+            attachedCollider = GetComponent<Collider>();
 
             attachedCollider.enabled = false;
         }

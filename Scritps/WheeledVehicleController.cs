@@ -161,6 +161,13 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             BeingDrivenLocally = false;
 
             linkedCockpitController.Active = false;
+
+            //Reset inputs:
+            linkedCockpitController.ResetControls();
+
+            driveInput = 0;
+            breakingInput = 1;
+            steeringInput = 0;
         }
 
         public float[] GetWheelColliderHeight()

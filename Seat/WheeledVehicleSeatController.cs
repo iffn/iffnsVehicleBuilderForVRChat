@@ -138,7 +138,10 @@ public class WheeledVehicleSeatController : SeatController
     {
         base.OnStationExited(player);
 
-        linkedVehicle.ExitedDriverSeat();
+        if (player.isLocal)
+        {
+            linkedVehicle.ExitedDriverSeat();
+        }
 
         if (Networking.LocalPlayer.IsUserInVR()) SetVrEnableState(false);
     }

@@ -109,6 +109,16 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         Vector2 rightJoystickInput;
         Vector2 leftJoystickInput;
 
+        public void ResetControls()
+        {
+            leftJoystickInput = Vector2.zero;
+            rightJoystickInput = Vector2.zero;
+
+            driveInput = 0;
+            breakingInput = 1;
+            steeringInput = 0;
+        }
+
         public bool Active
         {
             set
@@ -118,17 +128,17 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                 LinkedDriveDirectionInteractor.ColliderState = value;
 
                 LinkedMapDisplay.gameObject.SetActive(value);
-
-                
             }
         }
-
-        
 
         public void Setup(bool active)
         {
 
             IsUserInVR = Networking.LocalPlayer.IsUserInVR();
+
+            LinkedDriveDirectionInteractor.Setup();
+
+            LinkedVRBreakHolder.Setup();
 
             Active = active;
 
@@ -182,12 +192,16 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
         void ApplyVRControls()
         {
+            steeringInput = LinkedVRSteeringWheel.SteeringInput;
+
             //Check hand: Return if not held, otherwise get drive and brake inputs
             switch (LinkedVRSteeringWheel.currentPickupHand)
             {
                 case VRC_Pickup.PickupHand.None:
                     if (rightJoystickInput.magnitude > 0.3f)
                     {
+                        Debug.Log("Exiting vehicle by walking");
+
                         linkedDriverStation.ForceExit();
                     }
                     return;

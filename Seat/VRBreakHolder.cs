@@ -20,7 +20,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             }
         }
 
-        void Start()
+        public override void Setup()
         {
             if (!Networking.LocalPlayer.IsUserInVR())
             {
@@ -30,7 +30,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
             initialLocalPosition = transform.localPosition;
 
-            Setup();
+            base.Setup();
         }
 
         protected override void AdditionalLateUpdateFunctions()
