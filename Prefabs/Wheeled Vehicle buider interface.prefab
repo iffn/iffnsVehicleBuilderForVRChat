@@ -10936,6 +10936,7 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 2968391066160689930}
+  FlagRenderer: {fileID: 1102319239538691641}
   DebugOutput: {fileID: 2483077746809690145}
   DebugOutputHolder: {fileID: 6514380051694295802}
   MassInput: {fileID: 8213920815877630773}

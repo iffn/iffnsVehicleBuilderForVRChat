@@ -22,13 +22,16 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         //Inspector values:
         //[Header("Settings")]
 
+        [Header("Settings")]
+        [SerializeField] Material FlagMaterial;
+
         [Header("Unity assingments")]
         [SerializeField] WheeledVehicleBuilder linkedVehicleBuilder;
         [SerializeField] WheeledVehicleSeatController linkedDriverStation;
         [SerializeField] WheeledVehicleSync linkedVehicleSync;
         [SerializeField] CockpitController linkedCockpitController;
 
-        public BuilderUIController LinkedUI; //For updating vehicle during sync;
+        public BuilderUIController LinkedUICanBeNull; //For updating vehicle during sync;
 
         public Rigidbody LinkedRigidbody { get; private set; }
 
@@ -289,11 +292,6 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                 Debug.LogWarning($"Error during setup of {gameObject.name}: {nameof(linkedVehicleSync)} not assigned");
                 failed = true;
             }
-            if (LinkedUI == null)
-            {
-                Debug.LogWarning($"Error during setup of {gameObject.name}: {nameof(LinkedUI)} not assigned");
-                failed = true;
-            }
 
             return failed;
         }
@@ -322,7 +320,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             linkedDriverStation.Setup(this);
             linkedVehicleSync.Setup(linkedVehicle: this);
             linkedVehicleBuilder.Setup(linkedController: this);
-            LinkedUI.Setup(linkedVehicle: this);
+            if (LinkedUICanBeNull) LinkedUICanBeNull.Setup(linkedVehicle: this);
 
             //Setup builder
 
@@ -332,6 +330,10 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
             spawnLocalPosition = transform.localPosition;
             spawnLocalRotation = transform.localRotation;
+
+            linkedVehicleBuilder.SetFlagMaterial(FlagMaterial);
+            linkedCockpitController.SetFlagMaterial(FlagMaterial);
+            if (LinkedUICanBeNull) LinkedUICanBeNull.SetFlagMaterial(FlagMaterial);
         }
 
         void UpdateWheelMeshPositionWhenOwner()

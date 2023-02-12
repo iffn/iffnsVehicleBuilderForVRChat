@@ -18,6 +18,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         [SerializeField] float maxSteeringAnlgeDeg = 45;
 
         [Header("Unity assingments")]
+        [SerializeField] MeshRenderer FlagRenderer;
         [SerializeField] WheeledVehicleSeatController linkedDriverStation;
         [SerializeField] DriveDirectionInteractor LinkedDriveDirectionInteractor;
         [SerializeField] VRSteeringWheel LinkedVRSteeringWheel;
@@ -73,6 +74,11 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             }
 
             return failed;
+        }
+
+        public void SetFlagMaterial(Material material)
+        {
+            FlagRenderer.material = material;
         }
 
         bool active = false;

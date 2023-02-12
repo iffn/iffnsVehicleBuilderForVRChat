@@ -171,7 +171,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             linkedVehicle.UpdateParametersBasedOnOwnership();
 
             //Inform UI
-            linkedVehicle.LinkedUI.SetVehicleOwnerDisplay(player);
+            linkedVehicle.LinkedUICanBeNull.SetVehicleOwnerDisplay(player);
 
             //Ensure ownership of builder
             linkedVehicle.LinkedVehicleBuilder.MakeLocalPlayerOwner();

@@ -20,6 +20,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         [SerializeField] WheelCollider WheelPrefab;
         [SerializeField] SeatController[] AvailableSeats;
         [SerializeField] Transform FlagMover;
+        [SerializeField] MeshRenderer FlagRenderer;
 
         //Body mesh templates
         [SerializeField] GameObject CenterFrontTemplate;
@@ -216,9 +217,14 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                     break;
             }
 
-            linkedController.LinkedUI.UpdateUIFromVehicle();
+            if(linkedController.LinkedUICanBeNull) linkedController.LinkedUICanBeNull.UpdateUIFromVehicle();
 
             BuildFromParameters();
+        }
+
+        public void SetFlagMaterial(Material material)
+        {
+            FlagRenderer.material = material;
         }
 
         public void SetInitialParameters()
@@ -235,7 +241,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         {
             BuildVehicleBasedOnBuildParameters();
 
-            linkedController.LinkedUI.UpdateUIFromVehicle();
+            if (linkedController.LinkedUICanBeNull) linkedController.LinkedUICanBeNull.UpdateUIFromVehicle();
         }
         
         void BuildBody()

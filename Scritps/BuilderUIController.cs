@@ -17,9 +17,11 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             - Provide user interface for ownership changes
         */
 
-        [Header("Unity assingments")]
         WheeledVehicleBuilder linkedVehicleBuilder;
         WheeledVehicleController linkedVehicle;
+
+        [Header("Unity assingments")]
+        [SerializeField] Image FlagRenderer;
 
         [SerializeField] InputField DebugOutput;
         [SerializeField] GameObject DebugOutputHolder;
@@ -68,6 +70,11 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         public void ToggleFixVehicle()
         {
             linkedVehicle.VehicleFixed = FixVehicleToggle.isOn;
+        }
+
+        public void SetFlagMaterial(Material material)
+        {
+            FlagRenderer.material = material;
         }
 
         public void UpdateVehicleFromUI()
