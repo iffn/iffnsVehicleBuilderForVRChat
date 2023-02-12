@@ -20,9 +20,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         */
 
         //Inspector values:
-        [Header("Settings")]
-        [SerializeField] float maxSteeringAnlgeDeg = 45;
-        [SerializeField] bool debugMode = false;
+        //[Header("Settings")]
 
         [Header("Unity assingments")]
         [SerializeField] WheeledVehicleBuilder linkedVehicleBuilder;
@@ -60,6 +58,8 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
         Vector3 spawnLocalPosition;
         Quaternion spawnLocalRotation;
+
+        float lastUpdate;
 
         bool vehicleFixed = false;
         public bool VehicleFixed
@@ -111,6 +111,27 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                     ResetInputs();
                 }
             }
+        }
+
+        public string DebugString()
+        {
+            string returnString = "";
+
+            string newLine = "\n";
+
+            returnString += $"Debug of {nameof(WheeledVehicleSeatController)} at {Time.time}:" + newLine;
+            returnString += $"• {nameof(lastUpdate)} = {lastUpdate}" + newLine;
+            returnString += $"• {nameof(beingDrivenLocally)} = {beingDrivenLocally}" + newLine;
+            returnString += $"• {nameof(driveInput)} = {driveInput}" + newLine;
+            returnString += $"• {nameof(breakingInput)} = {breakingInput}" + newLine;
+            returnString += $"• {nameof(steeringInput)} = {steeringInput}" + newLine;
+            returnString += $"• {nameof(driveInput)} = {driveInput}" + newLine;
+            returnString += newLine;
+
+            returnString += linkedVehicleSync.DebugString();
+            returnString += linkedVehicleBuilder.DebugString();
+
+            return returnString;
         }
 
         public void RespawnVehicle()
@@ -356,36 +377,9 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             }
         }
 
-        bool debugActive = false;
-
-        void DebugFunction()
-        {
-            if(Input.GetKey(KeyCode.Home) || Input.GetAxis("Oculus_GearVR_RThumbstickY") > 0.8f)
-            {
-                if (debugActive) return;
-
-                //                                      V---Manually adjust this for each class ffs
-                Debug.Log($"Class {nameof(WheeledVehicleController)} of GameObject {gameObject.name} worked at {Time.time}");
-
-                Debug.Log($"First wheel active = {drivenWheels[0]}");
-
-                Debug.Log($"Owner of sync controller = {Networking.GetOwner(LinkedVehicleSync.gameObject).playerId}");
-                Debug.Log($"Owner of builder controller = {Networking.GetOwner(LinkedVehicleBuilder.gameObject).playerId}");
-
-                debugActive = true;
-            }
-            else
-            {
-                debugActive = false;
-            }
-        }
-
         private void Update()
         {
-            if (debugMode)
-            {
-                DebugFunction();
-            }
+            lastUpdate = Time.time;
 
             if (linkedVehicleSync.LocallyOwned)
             {

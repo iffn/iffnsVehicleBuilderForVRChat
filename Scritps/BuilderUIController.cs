@@ -20,6 +20,9 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         WheeledVehicleBuilder linkedVehicleBuilder;
         WheeledVehicleController linkedVehicle;
 
+        [SerializeField] InputField DebugOutput;
+        [SerializeField] GameObject DebugOutputHolder;
+
         //Vehicle
         [SerializeField] FloatInputLineController MassInput;
         [SerializeField] FloatInputLineController WidthWithWheelsInput;
@@ -370,6 +373,16 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
             linkedVehicleBuilder.BuildFromParameters();
             UpdateUIFromVehicle();
+        }
+
+        public void ToggleDebugOutput()
+        {
+            DebugOutputHolder.SetActive(!DebugOutputHolder.activeSelf);
+        }
+
+        public void UpdateDebugOutput()
+        {
+            DebugOutput.text = linkedVehicle.DebugString();
         }
     }
 }

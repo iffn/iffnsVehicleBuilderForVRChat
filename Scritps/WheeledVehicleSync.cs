@@ -71,6 +71,28 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         bool locallyOwned = false;
         float heading = 0;
         float previousHeading = 0;
+        float lastUpdate;
+
+        public string DebugString()
+        {
+            string returnString = "";
+
+            string newLine = "\n";
+
+            returnString += $"Debug of {nameof(WheeledVehicleSync)}:" + newLine;
+            returnString += $"• {nameof(lastUpdate)} = {lastUpdate}" + newLine;
+
+            VRCPlayerApi owner = Networking.GetOwner(gameObject);
+            returnString += $"• Owner = {owner.playerId}: {owner.displayName} {(owner.isLocal ? "(You)" : "")}" + newLine;
+
+            returnString += $"• {nameof(locallyOwned)} = {locallyOwned}" + newLine;
+            returnString += $"• {nameof(heading)} = {heading}" + newLine;
+            returnString += $"• {nameof(previousHeading)} = {previousHeading}" + newLine;
+
+            returnString += newLine;
+
+            return returnString;
+        }
 
         public bool LocallyOwned
         {
@@ -112,7 +134,9 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         {
             //Update controlled by vehicle controller
 
-            if(Input.GetKeyDown(KeyCode.Home))
+            lastUpdate = Time.time;
+
+            if (Input.GetKeyDown(KeyCode.Home))
             {
                 Debug.Log($"Sync owner = {Networking.GetOwner(gameObject).playerId}, {nameof(locallyOwned)} value = {locallyOwned}");
             }

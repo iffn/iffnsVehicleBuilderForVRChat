@@ -2,6 +2,7 @@
 using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
+using static Cinemachine.CinemachineOrbitalTransposer;
 
 namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 {
@@ -42,6 +43,8 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         public const int maxSeatRows = 5;
         public const float seatWidth = 0.45f;
 
+        float lastUpdate;
+
         //Bulid parameters:
         //-----------------
 
@@ -67,6 +70,31 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
         [UdonSynced(UdonSyncMode.None)] public bool limitedParameters = true;
 
+        public string DebugString()
+        {
+            string returnString = "";
+
+            string newLine = "\n";
+
+            returnString += $"Debug of {nameof(WheeledVehicleBuilder)}:" + newLine;
+            returnString += $"• {nameof(lastUpdate)} = {lastUpdate}" + newLine;
+
+            VRCPlayerApi owner = Networking.GetOwner(gameObject);
+            returnString += $"• Owner = {owner.playerId}: {owner.displayName} {(owner.isLocal ? "(You)" : "")}" + newLine;
+
+            returnString += $"• {nameof(mass)} = {mass}" + newLine;
+            returnString += $"• {nameof(widthWithWheels)} = {widthWithWheels}" + newLine;
+            returnString += $"• {nameof(length)} = {length}" + newLine;
+
+            returnString += newLine;
+
+            return returnString;
+        }
+
+        private void Update()
+        {
+            lastUpdate = Time.time;
+        }
 
         //Funcitons:
         //----------
