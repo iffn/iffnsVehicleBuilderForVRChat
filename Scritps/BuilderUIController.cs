@@ -1,4 +1,5 @@
-﻿using UdonSharp;
+﻿using Mono.Cecil;
+using UdonSharp;
 using UnityEngine;
 using UnityEngine.UI;
 using VRC.SDKBase;
@@ -373,6 +374,25 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
             linkedVehicleBuilder.BuildFromParameters();
             UpdateUIFromVehicle();
+        }
+
+        public void AutoSetWheelRotations()
+        {
+            int wheelPairs = linkedVehicleBuilder.numberOfWheels / 2;
+
+            float maxAngle = Mathf.Clamp(Mathf.Abs(linkedVehicleBuilder.steeringAngleDeg[0]), 5, 30);
+
+            float incrementAngle = maxAngle * 2 / (wheelPairs - 1);
+
+            for(int i = 0; i<wheelPairs; i++)
+            {
+                float angle = -maxAngle + incrementAngle * i;
+
+                linkedVehicleBuilder.steeringAngleDeg[i] = angle;
+            }
+
+            UpdateUIFromVehicle();
+            
         }
 
         public void ToggleDebugOutput()
