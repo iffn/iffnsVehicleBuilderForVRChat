@@ -1,5 +1,4 @@
-﻿using Mono.Cecil;
-using UdonSharp;
+﻿using UdonSharp;
 using UnityEngine;
 using UnityEngine.UI;
 using VRC.SDKBase;
@@ -44,6 +43,8 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         [SerializeField] Toggle[] DrivenWheelToggle;
         [SerializeField] FloatInputLineController MotorTorqueInput;
         [SerializeField] FloatInputLineController BreakTorqueInput;
+        [SerializeField] TMPro.TextMeshProUGUI MotorTorqueGradientText;
+        [SerializeField] TMPro.TextMeshProUGUI BreakTorqueGradientText;
         [SerializeField] InputField[] SteeringAngleInputField;
 
         //[SerializeField] Button ClaimOwnershipButton;
@@ -173,6 +174,13 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             skipUICalls = false;
         }
 
+        float GetMaxGradientRad(float torque, float radius, int numberOfWheels, float mass)
+        {
+            float forceFromTorque = torque * radius * numberOfWheels;
+
+            return Mathf.Acos(forceFromTorque / mass * Physics.gravity.magnitude);
+        }
+
         public void UpdateUIFromVehicle()
         {
             //Sync serious mode
@@ -228,6 +236,16 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
             MotorTorqueInput.Value = linkedVehicleBuilder.motorTorquePerDrivenWheel;
             BreakTorqueInput.Value = linkedVehicleBuilder.breakTorquePerWheel;
+
+            int drivenWheelCount = 0;
+
+            for(int i = 0; i<linkedVehicleBuilder.numberOfWheels / 2; i++)
+            {
+                if (linkedVehicleBuilder.drivenWheelPairs[i]) drivenWheelCount += 2;
+            }
+
+            MotorTorqueGradientText.text = $"{GetMaxGradientRad(linkedVehicleBuilder.motorTorquePerDrivenWheel, linkedVehicleBuilder.wheelRadius, drivenWheelCount, linkedVehicleBuilder.mass) * Mathf.Rad2Deg}°";
+            BreakTorqueGradientText.text = $"{GetMaxGradientRad(linkedVehicleBuilder.breakTorquePerWheel, linkedVehicleBuilder.wheelRadius, linkedVehicleBuilder.numberOfWheels, linkedVehicleBuilder.mass) * Mathf.Rad2Deg}°";
 
             for (int i = 0; i < WheeledVehicleBuilder.maxWheels / 2; i++)
             {
