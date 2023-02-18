@@ -68,10 +68,14 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
         WheeledVehicleController linkedVehicle;
 
+        VRCPlayerApi localPlayer;
+
         bool locallyOwned = false;
         float heading = 0;
         float previousHeading = 0;
         float lastUpdate;
+
+        int counter;
 
         public string DebugString()
         {
@@ -109,7 +113,9 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             enabled = true;
             this.linkedVehicle = linkedVehicle;
 
-            locallyOwned = Networking.LocalPlayer.IsOwner(gameObject);
+            localPlayer = Networking.LocalPlayer;
+
+            locallyOwned = localPlayer.IsOwner(gameObject);
         }
 
         public float GetCaluclatedTurnRateIfSynced
@@ -140,6 +146,28 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             {
                 Debug.Log($"Sync owner = {Networking.GetOwner(gameObject).playerId}, {nameof(locallyOwned)} value = {locallyOwned}");
             }
+
+            counter++;
+
+            if(counter % 100 == 0)
+            {
+                counter -= 100;
+
+                EnsureCorrectOwnership();
+            }
+        }
+
+        void EnsureCorrectOwnership()
+        {
+            if (!Networking.IsOwner(gameObject)) return;
+
+            if (!locallyOwned)
+            {
+                Debug.LogWarning("Locally owned somehow didn't work");
+                locallyOwned = true;
+            }
+
+            linkedVehicle.LinkedVehicleBuilder.MakeLocalPlayerOwner();
         }
 
         public override void OnDeserialization()
@@ -151,15 +179,17 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         {
             if (Networking.IsOwner(gameObject)) return;
 
-            Networking.SetOwner(Networking.LocalPlayer, gameObject);
+            Networking.SetOwner(localPlayer, gameObject);
+
+            linkedVehicle.LinkedVehicleBuilder.MakeLocalPlayerOwner();
         }
 
         public override void OnPlayerLeft(VRCPlayerApi player)
         {
-            if (Networking.LocalPlayer.IsOwner(gameObject) && !locallyOwned)
+            if (localPlayer.IsOwner(gameObject) && !locallyOwned)
             {
                 Debug.Log("If you see this message, VRChat has not fixed OnOwnershipTransferred on owner leave yet ");
-                OnOwnershipTransferred(Networking.LocalPlayer);
+                OnOwnershipTransferred(localPlayer);
             }
         }
 
