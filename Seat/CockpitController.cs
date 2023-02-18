@@ -112,13 +112,13 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             }
         }
 
-        Vector2 rightJoystickInput;
-        Vector2 leftJoystickInput;
+        Vector2 lookInput;
+        Vector2 moveInput;
 
         public void ResetControls()
         {
-            leftJoystickInput = Vector2.zero;
-            rightJoystickInput = Vector2.zero;
+            moveInput = Vector2.zero;
+            lookInput = Vector2.zero;
 
             driveInput = 0;
             breakingInput = 1;
@@ -204,7 +204,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             switch (LinkedVRSteeringWheel.currentPickupHand)
             {
                 case VRC_Pickup.PickupHand.None:
-                    if (rightJoystickInput.magnitude > 0.3f)
+                    if (moveInput.magnitude > 0.3f)
                     {
                         Debug.Log("Exiting vehicle by walking");
 
@@ -213,24 +213,24 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                     return;
                 case VRC_Pickup.PickupHand.Left:
                     driveInput = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger");
-                    if (leftJoystickInput.y > 0)
+                    if (moveInput.y > 0)
                     {
-                        driveInput = Mathf.Clamp01(driveInput + leftJoystickInput.y);
+                        driveInput = Mathf.Clamp01(driveInput + moveInput.y);
                     }
                     else
                     {
-                        breakingInput = Mathf.Clamp01(breakingInput - leftJoystickInput.y);
+                        breakingInput = Mathf.Clamp01(breakingInput - moveInput.y);
                     }
                     break;
                 case VRC_Pickup.PickupHand.Right:
                     driveInput = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger");
-                    if (rightJoystickInput.y > 0)
+                    if (lookInput.y > 0)
                     {
-                        driveInput = Mathf.Clamp01(driveInput + rightJoystickInput.y);
+                        driveInput = Mathf.Clamp01(driveInput + lookInput.y);
                     }
                     else
                     {
-                        breakingInput = Mathf.Clamp01(breakingInput - rightJoystickInput.y);
+                        breakingInput = Mathf.Clamp01(breakingInput - lookInput.y);
                     }
                     break;
                 default:
@@ -247,22 +247,22 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
         public override void InputLookVertical(float value, UdonInputEventArgs args)
         {
-            rightJoystickInput.y = value;
+            lookInput.y = value;
         }
 
         public override void InputLookHorizontal(float value, UdonInputEventArgs args)
         {
-            rightJoystickInput.x = value;
+            lookInput.x = value;
         }
 
         public override void InputMoveVertical(float value, UdonInputEventArgs args)
         {
-            leftJoystickInput.y = value;
+            moveInput.y = value;
         }
 
         public override void InputMoveHorizontal(float value, UdonInputEventArgs args)
         {
-            leftJoystickInput.x = value;
+            moveInput.x = value;
         }
     }
 }

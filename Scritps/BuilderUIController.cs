@@ -174,11 +174,34 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             skipUICalls = false;
         }
 
-        float GetMaxGradientRad(float torque, float radius, int numberOfWheels, float mass)
+        float GetMaxGradientRad(float torque, float radius, int numberOfDrivenWheels, float mass)
         {
-            float forceFromTorque = torque * radius * numberOfWheels;
+            float forceFromTorque = torque * radius * numberOfDrivenWheels;
 
-            return Mathf.Acos(forceFromTorque / mass * Physics.gravity.magnitude);
+            float forceFromMass = mass * Physics.gravity.magnitude;
+
+            if (forceFromTorque > forceFromMass) return Mathf.PI * 0.5f;
+
+            float asinValue = forceFromTorque / forceFromMass;
+            
+            Debug.Log($"asin({forceFromTorque} / {forceFromMass}) = asin{asinValue} = {Mathf.Asin(asinValue)} with {numberOfDrivenWheels} wheels");
+
+            return Mathf.Asin(asinValue);
+        }
+
+        public void UpdateGradient()
+        {
+            int drivenWheelCount = 0;
+
+            for (int i = 0; i < linkedVehicleBuilder.numberOfWheels / 2; i++)
+            {
+                if (linkedVehicleBuilder.drivenWheelPairs[i]) drivenWheelCount += 2;
+            }
+
+            Debug.Log("Calculating gradient");
+
+            MotorTorqueGradientText.text = $"{GetMaxGradientRad(linkedVehicleBuilder.motorTorquePerDrivenWheel, linkedVehicleBuilder.wheelRadius, drivenWheelCount, linkedVehicleBuilder.mass) * Mathf.Rad2Deg}°";
+            BreakTorqueGradientText.text = $"{GetMaxGradientRad(linkedVehicleBuilder.breakTorquePerWheel, linkedVehicleBuilder.wheelRadius, linkedVehicleBuilder.numberOfWheels, linkedVehicleBuilder.mass) * Mathf.Rad2Deg}°";
         }
 
         public void UpdateUIFromVehicle()
@@ -237,15 +260,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             MotorTorqueInput.Value = linkedVehicleBuilder.motorTorquePerDrivenWheel;
             BreakTorqueInput.Value = linkedVehicleBuilder.breakTorquePerWheel;
 
-            int drivenWheelCount = 0;
-
-            for(int i = 0; i<linkedVehicleBuilder.numberOfWheels / 2; i++)
-            {
-                if (linkedVehicleBuilder.drivenWheelPairs[i]) drivenWheelCount += 2;
-            }
-
-            MotorTorqueGradientText.text = $"{GetMaxGradientRad(linkedVehicleBuilder.motorTorquePerDrivenWheel, linkedVehicleBuilder.wheelRadius, drivenWheelCount, linkedVehicleBuilder.mass) * Mathf.Rad2Deg}°";
-            BreakTorqueGradientText.text = $"{GetMaxGradientRad(linkedVehicleBuilder.breakTorquePerWheel, linkedVehicleBuilder.wheelRadius, linkedVehicleBuilder.numberOfWheels, linkedVehicleBuilder.mass) * Mathf.Rad2Deg}°";
+            UpdateGradient();
 
             for (int i = 0; i < WheeledVehicleBuilder.maxWheels / 2; i++)
             {

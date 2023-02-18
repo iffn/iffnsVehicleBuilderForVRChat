@@ -95,6 +95,8 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             }
 
             linkedUIController.UpdateVehicleFromUI();
+
+            linkedUIController.UpdateGradient();
         }
 
         public void UpdateFromSlider()
@@ -104,6 +106,8 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             Value = LinkedSlider.value;
 
             linkedUIController.UpdateVehicleFromUI();
+
+            linkedUIController.UpdateGradient();
         }
     }
 }
