@@ -159,7 +159,11 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
         void EnsureCorrectOwnership()
         {
-            if (!Networking.IsOwner(gameObject)) return;
+            VRCPlayerApi owner = Networking.GetOwner(gameObject);
+
+            if (linkedVehicle.LinkedUICanBeNull) linkedVehicle.LinkedUICanBeNull.SetVehicleOwnerDisplay(player);
+
+            if (!owner.isLocal) return;
 
             if (!locallyOwned)
             {
@@ -201,7 +205,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             linkedVehicle.UpdateParametersBasedOnOwnership();
 
             //Inform UI
-            linkedVehicle.LinkedUICanBeNull.SetVehicleOwnerDisplay(player);
+            if(linkedVehicle.LinkedUICanBeNull) linkedVehicle.LinkedUICanBeNull.SetVehicleOwnerDisplay(player);
 
             //Ensure ownership of builder
             linkedVehicle.LinkedVehicleBuilder.MakeLocalPlayerOwner();

@@ -63,6 +63,8 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         bool skipUICalls = false; //Unable to disable function calls when updating UI fields. Therefore using flag to check for skipping
         bool limitedParameters = true;
 
+        VRCPlayerApi currentOwner;
+
         public void RespawnVehicle()
         {
             linkedVehicle.RespawnVehicle();
@@ -290,6 +292,10 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
         public void SetVehicleOwnerDisplay(VRCPlayerApi owner)
         {
+            if(currentOwner == owner) return;
+
+            currentOwner = owner;
+
             bool locallyOwned = owner.isLocal;
 
             foreach(GameObject o in OwnerObjects)
