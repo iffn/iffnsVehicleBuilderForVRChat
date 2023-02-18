@@ -161,7 +161,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         {
             VRCPlayerApi owner = Networking.GetOwner(gameObject);
 
-            if (linkedVehicle.LinkedUICanBeNull) linkedVehicle.LinkedUICanBeNull.SetVehicleOwnerDisplay(player);
+            if (linkedVehicle.LinkedUICanBeNull) linkedVehicle.LinkedUICanBeNull.SetVehicleOwnerDisplay(owner);
 
             if (!owner.isLocal) return;
 
