@@ -124,7 +124,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                 linkedVehicleBuilder.numberOfSeatRows = currentInt;
             }
 
-            linkedVehicleBuilder.seatLenghtRatio = SeatLengthRatioInput.Value;
+            linkedVehicleBuilder.seatLengthRatio = SeatLengthRatioInput.Value;
             linkedVehicleBuilder.seatWidthRatio = SeatWidthRatioInput.Value;
 
             for (int i = 0; i < SeatsMirroredToggle.Length; i++)
@@ -241,7 +241,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             CenterOfMassXYZInputFields[2].text = linkedVehicleBuilder.centerOfMassPositionRelativeToCenterBottom.z.ToString();
             NumberOfSeatRowsInputField.text = linkedVehicleBuilder.numberOfSeatRows.ToString();
 
-            SeatLengthRatioInput.Value = linkedVehicleBuilder.seatLenghtRatio;
+            SeatLengthRatioInput.Value = linkedVehicleBuilder.seatLengthRatio;
             SeatWidthRatioInput.Value = linkedVehicleBuilder.seatWidthRatio;
 
             for(int i = 0; i<WheeledVehicleBuilder.maxSeatRows; i++)

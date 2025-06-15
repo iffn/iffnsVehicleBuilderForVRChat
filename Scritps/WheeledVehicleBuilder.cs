@@ -56,7 +56,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         [UdonSynced(UdonSyncMode.None)] public float groundClearance;
         [UdonSynced(UdonSyncMode.None)] public Vector3 centerOfMassPositionRelativeToCenterBottom;
         [UdonSynced(UdonSyncMode.None)] public int numberOfSeatRows;
-        [UdonSynced(UdonSyncMode.None)] public float seatLenghtRatio;
+        [UdonSynced(UdonSyncMode.None)] public float seatLengthRatio;
         [UdonSynced(UdonSyncMode.None)] public float seatWidthRatio;
         [UdonSynced(UdonSyncMode.None)] public bool[] seatsMirrored;
 
@@ -64,10 +64,10 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
         [UdonSynced(UdonSyncMode.None)] public int numberOfWheels; //Divisible by 2, min = 4
         [UdonSynced(UdonSyncMode.None)] public float wheelRadius;
         [UdonSynced(UdonSyncMode.None)] public float wheelWidth;
-        [UdonSynced(UdonSyncMode.None)] public readonly bool[] drivenWheelPairs = new bool[maxWheels / 2];
+        [UdonSynced(UdonSyncMode.None)] public bool[] drivenWheelPairs = new bool[maxWheels / 2];
         [UdonSynced(UdonSyncMode.None)] public float motorTorquePerDrivenWheel;
         [UdonSynced(UdonSyncMode.None)] public float breakTorquePerWheel;
-        [UdonSynced(UdonSyncMode.None)] public readonly float[] steeringAngleDeg = new float[maxWheels / 2];
+        [UdonSynced(UdonSyncMode.None)] public float[] steeringAngleDeg = new float[maxWheels / 2];
 
         [UdonSynced(UdonSyncMode.None)] public bool limitedParameters = true;
 
@@ -129,14 +129,17 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
         public void SetBuildParameters(PresetVehicleTypes preset)
         {
-            mass = 1000;
-
-            seatWidthRatio = 0.35f;
-            seatLenghtRatio = 0.5f;
+            
 
             switch (preset)
             {
+                case PresetVehicleTypes.None:
+
+                    break;
                 case PresetVehicleTypes.ATV6Wheel:
+                    mass = 1000;
+                    seatWidthRatio = 0.35f;
+                    seatLengthRatio = 0.5f;
 
                     widthWithWheels = 2;
                     length = 3.2f;
@@ -166,6 +169,10 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
                     break;
                 case PresetVehicleTypes.Car:
+                    mass = 1000;
+                    seatWidthRatio = 0.35f;
+                    seatLengthRatio = 0.5f;
+
                     widthWithWheels = 1.8f;
                     length = 3f;
                     groundClearance = 0.3f;
@@ -190,6 +197,10 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                     steeringAngleDeg[0] = -25;
                     break;
                 case PresetVehicleTypes.Monstertruck:
+                    mass = 1000;
+                    seatWidthRatio = 0.35f;
+                    seatLengthRatio = 0.5f;
+
                     widthWithWheels = 6.8f;
                     length = 8.6f;
                     groundClearance = 1.2f;
@@ -214,6 +225,9 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
                     steeringAngleDeg[1] = 15;
                     break;
                 default:
+                    mass = 1000;
+                    seatWidthRatio = 0.35f;
+                    seatLengthRatio = 0.5f;
                     break;
             }
 
@@ -386,7 +400,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             //Seats
 
             float seatXPos = (widthWithWheels - seatWidth) * 0.5f * seatWidthRatio;
-            float seatZPosOffset = (numberOfSeatRows != 1) ? (length-seatWidth) * seatLenghtRatio / (numberOfSeatRows - 1) : 0;
+            float seatZPosOffset = (numberOfSeatRows != 1) ? (length-seatWidth) * seatLengthRatio / (numberOfSeatRows - 1) : 0;
             float seatHeight = wheelRadius + 0.1f; //+0.1 because of body thickness
 
             for(int i = 0; i < maxSeatRows; i++)
@@ -396,7 +410,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
                 if(i < numberOfSeatRows)
                 {
-                    float zPos = length * seatLenghtRatio * 0.5f - seatZPosOffset * i;
+                    float zPos = length * seatLengthRatio * 0.5f - seatZPosOffset * i;
 
                     AvailableSeats[firstSeat].gameObject.SetActive(true);
 
@@ -503,6 +517,7 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
 
     public enum PresetVehicleTypes
     {
+        None,
         ATV6Wheel,
         Car,
         Monstertruck
