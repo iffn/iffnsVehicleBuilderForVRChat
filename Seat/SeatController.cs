@@ -152,6 +152,10 @@ namespace iffnsStuff.iffnsVRCStuff.WheeledVehicles
             offset.x = 0;
 
             playerMover.transform.localPosition += offset;
+
+#if UNITY_EDITOR
+            playerMover.transform.localPosition = Vector3.zero;
+#endif
         }
 
         //VRChat functions:
